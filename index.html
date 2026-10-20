@@ -1,0 +1,1630 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Saberium</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Saberium: juego educativo de matemáticas, ciencias, sociales, humanidades y artes.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;600;700;800&family=Unbounded:wght@700;900&display=swap">
+<style>
+/* Saberium — juego educativo. Diseño: cuadro de mando de videojuego, fondo nocturno, cada campo con su color. */
+:root {
+  --bg: #0d0f1e; --bg2: #13162b; --card: #1a1e3a; --card2: #232850; --line: #2f3566;
+  --ink: #f1f2ff; --muted: #a6acd8; --gold: #ffc83d; --ok: #3ddc97; --bad: #ff5c7a; --brand: #8b9bff;
+  --fc: #8b9bff;
+  --display: 'Unbounded', 'Trebuchet MS', 'Segoe UI', system-ui, sans-serif;
+  --body: 'Figtree', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --r: 16px; --fs: 1;
+  color-scheme: dark;
+}
+:root.large { --fs: 1.18; }
+:root.contrast { --line: #8c94d8; --muted: #d4d8ff; --card: #14173a; }
+* { box-sizing: border-box; }
+html { font-size: calc(16px * var(--fs)); }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); font: 400 1rem/1.5 var(--body);
+  padding-block: 0 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  min-height: 100vh; overflow-x: hidden; -webkit-tap-highlight-color: transparent;
+}
+body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; background: var(--bgimg, none); }
+body[data-bg="aurora"] { --bgimg: radial-gradient(60% 45% at 12% 0%, rgba(76,141,255,.28), transparent 70%), radial-gradient(50% 40% at 95% 8%, rgba(46,217,138,.14), transparent 70%), radial-gradient(60% 50% at 50% 110%, rgba(169,139,255,.16), transparent 70%); }
+body[data-bg="dusk"] { --bgimg: radial-gradient(60% 45% at 10% 0%, rgba(255,138,61,.26), transparent 70%), radial-gradient(55% 45% at 95% 20%, rgba(242,92,193,.2), transparent 70%), radial-gradient(60% 50% at 40% 110%, rgba(169,139,255,.18), transparent 70%); }
+body[data-bg="neon"] { --bgimg: radial-gradient(50% 40% at 0% 10%, rgba(242,92,193,.3), transparent 70%), radial-gradient(50% 40% at 100% 0%, rgba(0,220,255,.22), transparent 70%), linear-gradient(180deg, transparent 60%, rgba(139,155,255,.1)); }
+body[data-bg="forest"] { --bgimg: radial-gradient(60% 45% at 85% 0%, rgba(46,217,138,.26), transparent 70%), radial-gradient(60% 50% at 0% 100%, rgba(76,141,255,.14), transparent 70%); }
+h1, h2, h3, p { margin: 0; }
+h1:focus { outline: none; }
+h1, h2, .wordmark { font-family: var(--display); font-weight: 700; text-wrap: balance; letter-spacing: -.01em; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:disabled { cursor: not-allowed; }
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; border-radius: 8px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.ic { width: 1.25em; height: 1.25em; flex: none; }
+small { color: var(--muted); }
+[hidden] { display: none !important; }
+
+/* ---------- barra superior ---------- */
+#top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; display: flex; align-items: center; gap: 12px; max-width: 1040px; margin: 0 auto; padding: 10px 0; background: linear-gradient(var(--bg) 70%, transparent); }
+body::after { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--bg); }
+.brand { display: inline-flex; align-items: center; gap: 10px; background: none; border: 0; padding: 4px; color: var(--ink); }
+.brand.sm span { font: 700 .8rem var(--display); letter-spacing: .08em; }
+.brand.sm .logo-mark { width: 30px; height: 30px; }
+.me { display: flex; align-items: center; gap: 10px; margin-left: auto; min-width: 0; }
+.me-info { display: flex; flex-direction: column; min-width: 90px; max-width: 150px; line-height: 1.2; }
+.me-info b { font-size: .9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.me-info span { font-size: .72rem; color: var(--muted); }
+.me-info .bar { height: 5px; margin-top: 3px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px; font-variant-numeric: tabular-nums; }
+.chip .ic { color: var(--gold); }
+.chip.coins b { color: var(--gold); }
+
+/* ---------- avatar ---------- */
+.avatar { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(145deg, #3a4390, #232850); display: grid; place-items: center; flex: none; border: 3px solid transparent; box-shadow: 0 0 0 2px var(--line); }
+.avatar .ic { width: 58%; height: 58%; }
+.avatar.big { width: 64px; height: 64px; }
+.frame-gold { box-shadow: 0 0 0 3px var(--gold), 0 0 14px rgba(255,200,61,.5); }
+.frame-neon { box-shadow: 0 0 0 3px #00dcff, 0 0 18px rgba(0,220,255,.7), 0 0 0 6px rgba(242,92,193,.5); }
+.frame-rainbow { border: 3px solid transparent; background: linear-gradient(145deg, #3a4390, #232850) padding-box, conic-gradient(#4c8dff, #2ed98a, #ff8a3d, #f25cc1, #a98bff, #4c8dff) border-box; box-shadow: none; }
+
+/* ---------- estructura ---------- */
+#app { max-width: 1040px; margin: 0 auto; padding-top: 8px; }
+.screen > section { animation: rise .35s ease both; }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.reduce *, .reduce *::before, .reduce *::after { animation: none !important; transition: none !important; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+.narrow { max-width: 680px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+section { display: flex; flex-direction: column; gap: 16px; }
+.shead { display: flex; align-items: center; gap: 12px; margin: 6px 0 4px; }
+.shead h1 { font-size: clamp(1.3rem, 4.5vw, 1.9rem); line-height: 1.15; }
+.shead p { color: var(--muted); font-size: .95rem; margin-top: 2px; }
+.shead h1:focus { outline: none; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.h3 { font: 700 .8rem var(--display); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.eyebrow { font: 600 .72rem var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.note { color: var(--muted); font-size: .92rem; }
+.empty { color: var(--muted); text-align: center; padding: 20px; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.row.sb { justify-content: space-between; }
+.row.wrap { gap: 12px; }
+.stack { display: flex; flex-direction: column; gap: 10px; }
+.actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.actions .btn { flex: 1 1 200px; }
+
+/* ---------- botones ---------- */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; padding: 10px 20px; border-radius: 12px; border: 1px solid var(--line); background: var(--card2); font-weight: 700; transition: transform .12s, background .15s, box-shadow .15s; }
+.btn:hover:not(:disabled) { transform: translateY(-1px); background: #2c3262; }
+.btn:active:not(:disabled) { transform: translateY(1px); }
+.btn.primary { background: var(--gold); border-color: var(--gold); color: #1b1500; box-shadow: 0 4px 0 #b88a00; }
+.btn.primary:hover:not(:disabled) { background: #ffd566; }
+.btn.primary:active:not(:disabled) { box-shadow: 0 1px 0 #b88a00; transform: translateY(3px); }
+.btn.ghost { background: transparent; }
+.btn.danger { background: var(--bad); border-color: var(--bad); color: #2a0610; }
+.btn.lg { min-height: 54px; font-size: 1.05rem; padding-inline: 28px; }
+.btn.sm { min-height: 38px; padding: 6px 14px; font-size: .9rem; }
+.btn.wide { width: 100%; }
+.btn:disabled { opacity: .45; box-shadow: none; }
+.icon-btn { width: 44px; height: 44px; flex: none; display: grid; place-items: center; border-radius: 12px; border: 1px solid var(--line); background: var(--card); }
+.icon-btn.sm { width: 38px; height: 38px; }
+.icon-btn:hover:not(:disabled) { background: var(--card2); }
+.icon-btn:disabled { opacity: .35; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chipbtn { padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg2); font-weight: 600; font-size: .92rem; }
+.chipbtn:hover { border-color: var(--fc); }
+.chipbtn.on { background: var(--fc); border-color: var(--fc); color: #10122a; }
+.bar { height: 8px; border-radius: 99px; background: rgba(255,255,255,.1); overflow: hidden; }
+.bar i { display: block; height: 100%; border-radius: 99px; background: var(--bc, var(--fc)); transition: width .5s ease; }
+
+/* ---------- inicio ---------- */
+.hero { gap: 28px; padding-top: clamp(16px, 6vh, 56px); align-items: center; text-align: center; }
+.hero-main { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+.brand.big { flex-direction: column; gap: 14px; }
+.logo-mark { width: 84px; height: 84px; filter: drop-shadow(0 0 22px rgba(139,155,255,.5)); animation: float 5s ease-in-out infinite; }
+@keyframes float { 50% { transform: translateY(-6px) rotate(3deg); } }
+.wordmark { font-size: clamp(2.2rem, 11vw, 4.6rem); font-weight: 900; letter-spacing: .06em; line-height: 1; margin-right: -.06em; }
+.tagline { max-width: 34ch; color: var(--muted); font-size: 1.15rem; }
+.hero-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.worlds-strip { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; width: 100%; }
+.worlds-strip li { background: var(--card); border: 1px solid var(--line); border-top: 4px solid var(--fc); border-radius: var(--r); padding: 16px 10px; display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; }
+.worlds-strip .ic { color: var(--fc); width: 2rem; height: 2rem; }
+.worlds-strip b { font-size: .92rem; }
+.worlds-strip span { font-size: .75rem; color: var(--muted); }
+@media (max-width: 720px) { .worlds-strip { grid-template-columns: repeat(2, 1fr); } .worlds-strip li:last-child { grid-column: 1 / -1; } }
+
+/* ---------- perfiles ---------- */
+.plist { display: flex; flex-direction: column; gap: 10px; }
+.pcard { display: flex; align-items: center; gap: 8px; }
+.pick { flex: 1; display: flex; align-items: center; gap: 14px; text-align: left; background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 12px 16px; min-width: 0; }
+.pick:hover { border-color: var(--brand); }
+.pn { display: flex; flex-direction: column; min-width: 0; }
+.pn b { overflow: hidden; text-overflow: ellipsis; }
+.form label:not(.avopt) { font-weight: 600; }
+input[type=text] { width: 100%; min-height: 48px; padding: 10px 14px; border-radius: 12px; border: 2px solid var(--line); background: var(--bg2); color: var(--ink); font: inherit; }
+input[type=text]:focus { border-color: var(--gold); outline: none; }
+input.right { border-color: var(--ok); } input.wrong { border-color: var(--bad); }
+fieldset { border: 0; padding: 0; margin: 0; } legend { font-weight: 600; margin-bottom: 8px; }
+.avchoice { display: flex; gap: 10px; flex-wrap: wrap; }
+.avopt input { position: absolute; opacity: 0; }
+.avopt span { display: flex; flex-direction: column; align-items: center; gap: 4px; width: 86px; padding: 12px 6px; border: 2px solid var(--line); border-radius: 14px; background: var(--bg2); cursor: pointer; }
+.avopt span .ic { width: 2rem; height: 2rem; }
+.avopt input:checked + span { border-color: var(--gold); background: var(--card2); }
+.avopt input:focus-visible + span { outline: 3px solid var(--gold); }
+.err { color: var(--bad); font-weight: 600; }
+.notice { background: rgba(255,92,122,.1); border: 1px solid var(--bad); border-radius: var(--r); padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+
+/* ---------- menú ---------- */
+.welcome { flex-direction: row; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
+.w-left { display: flex; align-items: center; gap: 16px; }
+.w-left h1 { font-size: clamp(1.3rem, 5vw, 1.9rem); }
+.w-xp { flex: 1 1 240px; display: flex; flex-direction: column; gap: 6px; }
+.w-xp span { color: var(--muted); font-size: .9rem; font-variant-numeric: tabular-nums; }
+.cta { display: flex; align-items: center; gap: 16px; width: 100%; text-align: left; padding: 18px 22px; border-radius: var(--r); border: 2px solid var(--fc); background: linear-gradient(100deg, color-mix(in srgb, var(--fc) 30%, var(--card)), var(--card)); }
+.cta > .ic:first-child { width: 2.2rem; height: 2.2rem; color: var(--fc); }
+.cta span { flex: 1; display: flex; flex-direction: column; }
+.cta small { color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; font-size: .72rem; }
+.cta b { font: 700 1.1rem var(--display); }
+.cta:hover { transform: translateY(-2px); }
+.tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+@media (max-width: 860px) { .tiles { grid-template-columns: repeat(2, 1fr); } }
+.tile { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 4px; text-align: left; padding: 18px; background: var(--card); border: 1px solid var(--line); border-radius: var(--r); min-height: 128px; transition: transform .15s, border-color .15s; }
+.tile:hover { transform: translateY(-3px); border-color: var(--brand); }
+.tile .ic { width: 1.8rem; height: 1.8rem; color: var(--brand); margin-bottom: auto; }
+.tile b { font-size: 1.02rem; } .tile small { font-size: .82rem; }
+.dot { position: absolute; top: 12px; right: 12px; min-width: 24px; height: 24px; border-radius: 99px; background: var(--bad); color: #fff; font: 700 .8rem/24px var(--body); text-align: center; font-style: normal; }
+
+/* ---------- modos y mundos ---------- */
+.mgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 14px; }
+.mcard { display: flex; flex-direction: column; gap: 8px; padding: 20px; background: var(--card); border: 1px solid var(--line); border-top: 4px solid var(--fc); border-radius: var(--r); }
+.mcard.locked { opacity: .7; }
+.mc-ic { width: 46px; height: 46px; display: grid; place-items: center; border-radius: 12px; background: color-mix(in srgb, var(--fc) 22%, transparent); color: var(--fc); }
+.mcard h2 { font-size: 1.05rem; } .mcard p { color: var(--muted); font-size: .95rem; }
+.mc-meta { font-size: .85rem !important; margin-top: auto; }
+.mcard .btn { margin-top: 6px; }
+.wlist, .fgrid { display: grid; gap: 14px; }
+.fgrid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+.world { background: var(--card); border: 1px solid var(--line); border-left: 6px solid var(--fc); border-radius: var(--r); padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+.world.locked { opacity: .6; }
+.w-head { display: flex; align-items: center; gap: 14px; }
+.w-head > .ic { width: 2rem; height: 2rem; color: var(--fc); }
+.w-head h2 { font-size: 1.05rem; } .w-head p { color: var(--muted); font-size: .88rem; }
+.w-head .pct { margin-left: auto; font: 700 1.3rem var(--display); color: var(--fc); }
+.w-lock { color: var(--muted); font-size: .9rem; }
+.levels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.lvl { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 6px; border-radius: 14px; border: 1px solid var(--line); background: var(--bg2); }
+.lvl:hover:not(:disabled) { border-color: var(--fc); background: var(--card2); }
+.lvl:disabled { opacity: .5; }
+.lv-n { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; background: var(--fc); color: #10122a; font-weight: 800; }
+.lvl:disabled .lv-n { background: var(--line); color: var(--ink); }
+.stars { display: inline-flex; gap: 2px; } .st .ic { width: 1rem; height: 1rem; color: var(--line); } .st.on .ic { color: var(--gold); fill: var(--gold); }
+.stars.big .st .ic { width: 2.2rem; height: 2.2rem; }
+.fcard { text-align: left; display: flex; flex-direction: column; gap: 8px; padding: 22px; background: var(--card); border: 1px solid var(--line); border-top: 5px solid var(--fc); border-radius: var(--r); transition: transform .15s; }
+.fcard:hover { transform: translateY(-3px); border-color: var(--fc); }
+.fcard .ic { width: 2.2rem; height: 2.2rem; color: var(--fc); }
+.fcard h2 { font-size: 1.1rem; } .fcard p { color: var(--muted); } .f-meta { font-size: .82rem; color: var(--fc); font-weight: 700; margin-top: 4px; }
+.brief-ic { width: 64px; height: 64px; display: grid; place-items: center; border-radius: 18px; background: color-mix(in srgb, var(--fc) 22%, transparent); color: var(--fc); }
+.brief-ic .ic { width: 2rem; height: 2rem; }
+.rules { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 6px; }
+.rules li::marker { color: var(--fc); }
+
+/* ---------- partida ---------- */
+.game { gap: 12px; max-width: 760px; margin: 0 auto; padding-top: 10px; }
+.hud { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10; background: linear-gradient(var(--bg) 75%, transparent); padding: 8px 0 12px; }
+.hud-field { display: flex; align-items: center; gap: 8px; color: var(--fc); font-weight: 700; min-width: 0; }
+.hud-field span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 520px) { .hud-field span { display: none; } }
+.hud-stats { margin-left: auto; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+.hearts { display: flex; gap: 2px; }
+.heart .ic { width: 1.4rem; height: 1.4rem; color: var(--line); }
+.heart.on .ic { color: var(--bad); fill: var(--bad); }
+.chip.time.low { border-color: var(--bad); color: var(--bad); animation: pulse .8s infinite; }
+.chip.streak .ic { color: var(--muted); } .chip.streak.hot .ic { color: #ff8a3d; fill: #ff8a3d; }
+@keyframes pulse { 50% { transform: scale(1.06); } }
+.prog { height: 6px; background: rgba(255,255,255,.1); border-radius: 99px; overflow: hidden; }
+.prog i { display: block; height: 100%; background: var(--gold); transition: width .4s; width: 0; }
+.qcard { background: var(--card); border: 1px solid var(--line); border-top: 5px solid var(--fc); border-radius: var(--r); padding: clamp(16px, 4vw, 28px); display: flex; flex-direction: column; gap: 18px; animation: rise .3s both; }
+.qcard.shake { animation: shake .4s; }
+@keyframes shake { 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }
+.qmeta { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag { font-size: .75rem; font-weight: 700; padding: 3px 10px; border-radius: 99px; background: color-mix(in srgb, var(--fc) 22%, transparent); color: var(--fc); letter-spacing: .02em; }
+.tag.ghost { background: transparent; border: 1px solid var(--line); color: var(--muted); }
+.tag.d1 { background: rgba(61,220,151,.16); color: var(--ok); } .tag.d2 { background: rgba(255,200,61,.16); color: var(--gold); } .tag.d3 { background: rgba(255,92,122,.16); color: var(--bad); }
+.tag.round { background: var(--brand); color: #10122a; }
+.qtext { font-size: clamp(1.15rem, 3.6vw, 1.55rem); line-height: 1.3; font-family: var(--body); font-weight: 700; letter-spacing: 0; }
+.opts { display: grid; gap: 10px; grid-template-columns: 1fr 1fr; }
+.opts.tf { grid-template-columns: 1fr 1fr; }
+@media (max-width: 560px) { .opts { grid-template-columns: 1fr; } .opts.tf { grid-template-columns: 1fr 1fr; } }
+.opt { display: flex; align-items: center; gap: 12px; text-align: left; padding: 14px; min-height: 58px; border-radius: 14px; border: 2px solid var(--line); background: var(--bg2); font-weight: 600; transition: transform .1s, border-color .15s; }
+.opt:hover:not(:disabled) { border-color: var(--fc); transform: translateY(-1px); }
+.opt kbd { flex: none; width: 28px; height: 28px; display: grid; place-items: center; border-radius: 8px; background: var(--card2); font: 700 .8rem var(--body); color: var(--muted); }
+.opt.right { border-color: var(--ok); background: rgba(61,220,151,.15); }
+.opt.wrong { border-color: var(--bad); background: rgba(255,92,122,.15); }
+.opt:disabled { cursor: default; color: var(--ink); }
+.fillf { display: flex; gap: 10px; flex-wrap: wrap; } .fillf input { flex: 1 1 220px; }
+.hint { color: var(--muted); font-size: .88rem; }
+.match { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 10px 0 14px; }
+.col { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.mi { padding: 12px 10px; border-radius: 12px; border: 2px solid var(--line); background: var(--bg2); font-weight: 600; text-align: center; overflow-wrap: anywhere; }
+.mi.sel { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(255,200,61,.3); }
+.mi.paired { color: #10122a; border-color: transparent; }
+.mi.c0 { background: #4c8dff; } .mi.c1 { background: #2ed98a; } .mi.c2 { background: #ff8a3d; } .mi.c3 { background: #f25cc1; } .mi.c4 { background: #a98bff; }
+.mi:disabled { cursor: default; }
+.order { list-style: none; padding: 0; margin: 10px 0 14px; display: flex; flex-direction: column; gap: 8px; }
+.order li { display: flex; align-items: center; gap: 10px; padding: 8px 8px 8px 12px; border: 2px solid var(--line); border-radius: 12px; background: var(--bg2); }
+.pos { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; background: var(--card2); font-weight: 800; font-size: .85rem; flex: none; }
+.otxt { flex: 1; font-weight: 600; min-width: 0; overflow-wrap: anywhere; }
+.feedback { border-radius: var(--r); padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; border: 2px solid; animation: rise .25s both; }
+.feedback.ok { background: rgba(61,220,151,.12); border-color: var(--ok); } .feedback.bad { background: rgba(255,92,122,.12); border-color: var(--bad); }
+.fb-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 1.1rem; } .feedback.ok .fb-head .ic { color: var(--ok); } .feedback.bad .fb-head .ic { color: var(--bad); }
+.gain { margin-left: auto; font-weight: 700; color: var(--muted); font-size: .92rem; }
+.fb-exp { color: var(--ink); opacity: .92; } .feedback .btn { align-self: flex-start; margin-top: 6px; }
+.overlay { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 20px; background: rgba(5,6,16,.8); backdrop-filter: blur(6px); }
+.modal { width: min(420px, 100%); background: var(--card); border: 1px solid var(--line); border-radius: 20px; padding: 26px; display: flex; flex-direction: column; gap: 14px; text-align: center; }
+.modal h2 { font-size: 1.3rem; } .modal p { color: var(--muted); }
+
+/* ---------- resultados ---------- */
+.results { max-width: 760px; margin: 0 auto; }
+.res-hero { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 10px 0; }
+.res-ic { width: 88px; height: 88px; display: grid; place-items: center; border-radius: 50%; background: color-mix(in srgb, var(--fc) 25%, transparent); color: var(--fc); animation: pop .6s both; }
+.res-ic .ic { width: 3rem; height: 3rem; }
+.results.win .res-ic { color: var(--gold); background: rgba(255,200,61,.18); box-shadow: 0 0 40px rgba(255,200,61,.35); }
+.results.lose .res-ic .ic { color: var(--bad); } .results.lose .res-ic { background: rgba(255,92,122,.14); }
+@keyframes pop { 0% { transform: scale(.3); } 70% { transform: scale(1.12); } 100% { transform: scale(1); } }
+.res-hero h1 { font-size: clamp(1.5rem, 6vw, 2.3rem); } .res-hero p { color: var(--muted); max-width: 46ch; }
+.banner { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 14px 18px; border-radius: var(--r); font-size: 1.05rem; }
+.banner.lvl { background: rgba(139,155,255,.18); border: 1px solid var(--brand); } .banner.rec { background: rgba(255,200,61,.14); border: 1px solid var(--gold); }
+.banner span { color: var(--muted); margin-left: auto; }
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+.stat { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 2px; }
+.stat b { font: 700 1.35rem var(--display); font-variant-numeric: tabular-nums; }
+.achlist, .achgrid, .records { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.achlist li, .achgrid li, .records li { display: flex; align-items: center; gap: 12px; }
+.achlist .ic { color: var(--gold); fill: var(--gold); }
+.achlist span, .achgrid span { display: flex; flex-direction: column; min-width: 0; }
+.achgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.achgrid li { padding: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg2); opacity: .6; }
+.achgrid li.got { opacity: 1; border-color: var(--fc, var(--gold)); } .achgrid li.got .ic { color: var(--fc, var(--gold)); fill: var(--fc, var(--gold)); }
+.records li { justify-content: space-between; } .records li span { flex: 1; } .records .ic { color: var(--brand); }
+.review summary { cursor: pointer; font-weight: 700; }
+.review ol { list-style: none; padding: 0; margin: 10px 0 0; display: flex; flex-direction: column; gap: 12px; }
+.review li { display: flex; gap: 10px; } .review li span { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.review li.ok .ic { color: var(--ok); } .review li.bad .ic { color: var(--bad); }
+
+/* ---------- perfil, misiones, tienda, progreso ---------- */
+.pfhead { flex-direction: row; align-items: center; gap: 18px; } .pfhead > div { flex: 1; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.mlist { display: flex; flex-direction: column; gap: 12px; }
+.mission { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+.mission.claimed { opacity: .6; } .mission.bonus { border-style: dashed; }
+.m-top { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: baseline; } .m-top h2 { font-size: 1rem; }
+.reward { display: inline-flex; align-items: center; gap: 4px; color: var(--gold); font-weight: 700; font-size: .9rem; }
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.tab { padding: 8px 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg2); font-weight: 700; }
+.tab.on { background: var(--brand); border-color: var(--brand); color: #10122a; }
+.igrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; }
+.item { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
+.item.eq { border-color: var(--gold); } .item h2 { font-size: .95rem; font-family: var(--body); }
+.bgprev { width: 100%; height: 64px; border-radius: 12px; border: 1px solid var(--line); background: var(--bg); position: relative; overflow: hidden; }
+.bgprev::before { content: ""; position: absolute; inset: 0; background: var(--bgimg); }
+.bgprev[data-bg="aurora"] { --bgimg: radial-gradient(60% 80% at 15% 0%, rgba(76,141,255,.6), transparent 70%), radial-gradient(50% 70% at 95% 20%, rgba(46,217,138,.4), transparent 70%); }
+.bgprev[data-bg="dusk"] { --bgimg: radial-gradient(60% 80% at 10% 0%, rgba(255,138,61,.6), transparent 70%), radial-gradient(55% 70% at 95% 30%, rgba(242,92,193,.5), transparent 70%); }
+.bgprev[data-bg="neon"] { --bgimg: radial-gradient(50% 80% at 0% 10%, rgba(242,92,193,.7), transparent 70%), radial-gradient(50% 80% at 100% 0%, rgba(0,220,255,.5), transparent 70%); }
+.bgprev[data-bg="forest"] { --bgimg: radial-gradient(60% 80% at 85% 0%, rgba(46,217,138,.6), transparent 70%), radial-gradient(60% 70% at 0% 100%, rgba(76,141,255,.35), transparent 70%); }
+.ttl { font: 700 .85rem var(--display); color: var(--gold); min-height: 64px; display: grid; place-items: center; }
+.pgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+.pcardf { background: var(--card); border: 1px solid var(--line); border-top: 4px solid var(--fc); border-radius: var(--r); padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+.subs { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+.subs li { display: grid; grid-template-columns: minmax(90px, 40%) 1fr 40px; gap: 10px; align-items: center; font-size: .88rem; } .subs small { text-align: right; font-variant-numeric: tabular-nums; }
+.empty-card { align-items: center; text-align: center; padding: 36px 20px; } .empty-card .ic { width: 3rem; height: 3rem; color: var(--brand); }
+
+/* ---------- ajustes ---------- */
+.switch { display: flex; align-items: center; gap: 14px; cursor: pointer; padding: 6px 0; }
+.switch input { position: absolute; opacity: 0; }
+.track { width: 50px; height: 28px; border-radius: 99px; background: var(--line); position: relative; flex: none; transition: background .2s; }
+.track::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; transition: transform .2s; }
+.switch input:checked + .track { background: var(--ok); } .switch input:checked + .track::after { transform: translateX(22px); }
+.switch input:focus-visible + .track { outline: 3px solid var(--gold); outline-offset: 2px; }
+.sl { display: flex; flex-direction: column; }
+.range { display: flex; flex-direction: column; gap: 6px; } .range input { width: 100%; accent-color: var(--gold); height: 28px; }
+
+/* ---------- avisos y efectos ---------- */
+#fx { position: fixed; inset: 0; z-index: 90; pointer-events: none; width: 100%; height: 100%; }
+#toasts { position: fixed; z-index: 120; left: 50%; transform: translateX(-50%); top: calc(env(safe-area-inset-top, 0px) + 12px); display: flex; flex-direction: column; gap: 8px; width: min(420px, calc(100vw - 32px)); pointer-events: none; }
+.toast { background: var(--card2); border: 1px solid var(--brand); border-radius: 14px; padding: 12px 16px; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,.5); animation: rise .3s both; transition: opacity .4s, transform .4s; }
+.toast.ach { border-color: var(--gold); } .toast span { color: var(--muted); font-size: .9rem; } .toast.out { opacity: 0; transform: translateY(-10px); }
+
+</style>
+<header id="top" hidden></header>
+<div id="app" class="screen" tabindex="-1"></div>
+<canvas id="fx" aria-hidden="true"></canvas>
+<div id="toasts" role="status" aria-live="polite"></div>
+<noscript>Saberium necesita JavaScript para funcionar.</noscript>
+<script>
+/* Saberium — contenido educativo: campos, materias y banco de preguntas */
+(function (S) {
+  'use strict';
+
+  S.FIELDS = [
+    { id: 'mat', name: 'Matemáticas', world: 'Nodo Numérico', color: '#4C8DFF',
+      blurb: 'Cálculo, álgebra, geometría y lógica.',
+      subjects: ['Operaciones', 'Fracciones y porcentajes', 'Potencias y raíces', 'Álgebra', 'Geometría', 'Funciones y sucesiones', 'Lógica'] },
+    { id: 'nat', name: 'Ciencias Naturales', world: 'Laboratorio Vivo', color: '#2ED98A',
+      blurb: 'Biología, física, química y medioambiente.',
+      subjects: ['Biología', 'Física', 'Química', 'Medioambiente'] },
+    { id: 'soc', name: 'Ciencias Sociales', world: 'Atlas del Tiempo', color: '#FF8A3D',
+      blurb: 'Historia, geografía, ciudadanía y economía.',
+      subjects: ['Historia de Colombia', 'Historia universal', 'Geografía', 'Ciudadanía', 'Cultura', 'Economía'] },
+    { id: 'hum', name: 'Humanidades', world: 'Biblioteca Infinita', color: '#F25CC1',
+      blurb: 'Lenguaje, literatura e inglés.',
+      subjects: ['Lenguaje', 'Inglés'] },
+    { id: 'art', name: 'Artes', world: 'Escenario Vivo', color: '#A98BFF',
+      blurb: 'Música y educación física.',
+      subjects: ['Música', 'Educación física'] }
+  ];
+
+  S.DIFFS = [
+    { id: 1, name: 'Fácil', points: 10, coins: 1 },
+    { id: 2, name: 'Intermedio', points: 20, coins: 2 },
+    { id: 3, name: 'Avanzado', points: 30, coins: 3 }
+  ];
+
+  const Q = [];
+  let n = 0;
+  function add(f, s, d, t, o) {
+    o.f = f; o.s = s; o.d = d; o.t = t; o.id = f + (++n);
+    o.pts = S.DIFFS[d - 1].points;
+    Q.push(o);
+  }
+  const mc = (f, s, d, q, opts, a, e) => add(f, s, d, 'mc', { q, o: opts, a, e });
+  const tf = (f, s, d, q, a, e) => add(f, s, d, 'tf', { q, a, e });
+  const fl = (f, s, d, q, a, e) => add(f, s, d, 'fill', { q, a: [].concat(a), e });
+  const mt = (f, s, d, q, pairs, e) => add(f, s, d, 'match', { q, pairs, e });
+  const od = (f, s, d, q, items, e) => add(f, s, d, 'order', { q, items, e });
+
+  /* ============ MATEMÁTICAS ============ */
+  mc('mat', 'Operaciones', 1, '¿Cuánto es 7 × 8?', ['54', '56', '58', '64'], 1, '7 × 8 = 56. Recuerda que 7 × 8 es 7 × 4 × 2 = 28 × 2.');
+  mc('mat', 'Operaciones', 1, '¿Cuánto es 125 + 378?', ['493', '503', '513', '603'], 1, '125 + 378 = 503: 100 + 300 = 400, 25 + 78 = 103, y 400 + 103 = 503.');
+  fl('mat', 'Operaciones', 1, 'Calcula mentalmente: 144 ÷ 12 = ?', ['12'], '12 × 12 = 144, por eso 144 ÷ 12 = 12.');
+  mc('mat', 'Operaciones', 1, 'Cálculo mental: ¿cuánto es 15 × 4?', ['45', '55', '60', '65'], 2, '15 × 4 = (10 × 4) + (5 × 4) = 40 + 20 = 60.');
+  tf('mat', 'Potencias y raíces', 1, 'La raíz cuadrada de 81 es 9.', true, '9 × 9 = 81, entonces √81 = 9.');
+  mc('mat', 'Fracciones y porcentajes', 1, '¿Cuál de estas fracciones equivale a 1/2?', ['2/3', '3/6', '3/5', '1/3'], 1, '3/6 se simplifica dividiendo numerador y denominador entre 3 y resulta 1/2.');
+  mc('mat', 'Fracciones y porcentajes', 2, '¿Cuánto es 3/4 + 1/4?', ['4/8', '1', '3/16', '2'], 1, 'Con el mismo denominador se suman los numeradores: 3/4 + 1/4 = 4/4 = 1.');
+  fl('mat', 'Fracciones y porcentajes', 2, '¿Cuál es el 25 % de 200?', ['50'], 'El 25 % es la cuarta parte: 200 ÷ 4 = 50.');
+  mc('mat', 'Fracciones y porcentajes', 2, 'Un artículo de $80.000 tiene 15 % de descuento. ¿Cuánto se paga?', ['$65.000', '$68.000', '$70.000', '$72.000'], 1, 'El 15 % de 80.000 es 12.000. Se paga 80.000 − 12.000 = $68.000.');
+  mc('mat', 'Potencias y raíces', 2, '¿Cuánto es 2⁵?', ['10', '16', '25', '32'], 3, '2⁵ = 2 × 2 × 2 × 2 × 2 = 32.');
+  tf('mat', 'Potencias y raíces', 2, 'Cualquier número distinto de cero elevado a la 0 es igual a 1.', true, 'Por definición a⁰ = 1 cuando a ≠ 0.');
+  fl('mat', 'Potencias y raíces', 2, 'Calcula √169.', ['13'], '13 × 13 = 169.');
+  fl('mat', 'Álgebra', 2, 'Si 3x + 5 = 20, ¿cuánto vale x?', ['5'], '3x = 20 − 5 = 15, y x = 15 ÷ 3 = 5.');
+  mc('mat', 'Álgebra', 3, '¿Cuál es la solución de 2(x − 3) = x + 4?', ['x = 7', 'x = 10', 'x = 14', 'x = −2'], 1, '2x − 6 = x + 4, entonces x = 10.');
+  fl('mat', 'Álgebra', 3, 'La ecuación x² − 5x + 6 = 0 tiene dos soluciones. ¿Cuál es la mayor?', ['3'], 'Se factoriza como (x − 2)(x − 3) = 0. Las soluciones son 2 y 3.');
+  mc('mat', 'Álgebra', 3, '¿Cuál es la factorización de x² − 9?', ['(x − 3)(x − 3)', '(x − 3)(x + 3)', '(x + 9)(x − 1)', '(x − 9)(x + 1)'], 1, 'Es una diferencia de cuadrados: a² − b² = (a − b)(a + b).');
+  mc('mat', 'Geometría', 1, '¿Cuál es el área de un rectángulo de 6 m de largo y 4 m de ancho?', ['10 m²', '20 m²', '24 m²', '48 m²'], 2, 'Área = base × altura = 6 × 4 = 24 m².');
+  fl('mat', 'Geometría', 2, '¿Cuál es el perímetro (en cm) de un cuadrado de lado 7 cm?', ['28', '28 cm'], 'Perímetro = 4 × lado = 4 × 7 = 28 cm.');
+  mc('mat', 'Geometría', 2, '¿Cuál es el volumen de un cubo de arista 3 cm?', ['9 cm³', '18 cm³', '27 cm³', '81 cm³'], 2, 'Volumen = arista³ = 3 × 3 × 3 = 27 cm³.');
+  fl('mat', 'Geometría', 2, 'Un triángulo tiene base 10 cm y altura 6 cm. ¿Cuál es su área en cm²?', ['30', '30 cm2', '30 cm²'], 'Área = (base × altura) ÷ 2 = 60 ÷ 2 = 30.');
+  mc('mat', 'Geometría', 3, '¿Cuál es el área de un círculo de radio 5?', ['10π', '25π', '5π', '50π'], 1, 'Área = π × r² = π × 25 = 25π.');
+  mt('mat', 'Geometría', 3, 'Relaciona cada figura con su fórmula de área.', [['Cuadrado', 'l × l'], ['Rectángulo', 'b × h'], ['Triángulo', '(b × h) ÷ 2'], ['Círculo', 'π × r²']], 'Cada figura tiene una fórmula propia; el triángulo es la mitad de un rectángulo.');
+  fl('mat', 'Funciones y sucesiones', 2, '¿Qué número sigue en la sucesión 3, 7, 11, 15, …?', ['19'], 'La sucesión aumenta de 4 en 4: 15 + 4 = 19.');
+  mc('mat', 'Funciones y sucesiones', 2, 'Si f(x) = 2x + 1, ¿cuánto vale f(4)?', ['7', '8', '9', '10'], 2, 'f(4) = 2 × 4 + 1 = 9.');
+  mc('mat', 'Funciones y sucesiones', 3, '¿Cuál es el valor del límite de (x² − 4)/(x − 2) cuando x tiende a 2?', ['0', '2', '4', 'No existe'], 2, 'Se factoriza: (x − 2)(x + 2)/(x − 2) = x + 2, que tiende a 4.');
+  fl('mat', 'Funciones y sucesiones', 3, 'En una sucesión aritmética con a₁ = 5 y diferencia 3, ¿cuánto vale el término 10?', ['32'], 'aₙ = a₁ + (n − 1)d = 5 + 9 × 3 = 32.');
+  od('mat', 'Lógica', 1, 'Ordena de menor a mayor estos números.', ['1/4', '0,3', '1/2', '0,75'], '1/4 = 0,25; después 0,3; luego 1/2 = 0,5 y por último 0,75.');
+  fl('mat', 'Lógica', 2, 'Si 3 cuadernos cuestan $9.000, ¿cuánto cuestan 7 cuadernos? (solo el número)', ['21000'], 'Cada cuaderno cuesta $3.000. Entonces 7 × 3.000 = $21.000.');
+  mc('mat', 'Lógica', 3, 'Un número aumentado en su 20 % es 60. ¿Cuál es el número?', ['40', '48', '50', '52'], 2, 'Número × 1,2 = 60, entonces número = 60 ÷ 1,2 = 50.');
+
+  /* ============ CIENCIAS NATURALES ============ */
+  mc('nat', 'Biología', 1, '¿Qué organelo produce la mayor parte de la energía (ATP) de la célula?', ['Núcleo', 'Mitocondria', 'Ribosoma', 'Vacuola'], 1, 'Las mitocondrias realizan la respiración celular y producen ATP.');
+  tf('nat', 'Biología', 1, 'Las células vegetales tienen pared celular.', true, 'La pared celular de celulosa da soporte y forma a las células vegetales.');
+  mc('nat', 'Biología', 1, '¿Qué órgano bombea la sangre por todo el cuerpo?', ['Pulmón', 'Hígado', 'Corazón', 'Riñón'], 2, 'El corazón es un músculo que impulsa la sangre por el sistema circulatorio.');
+  od('nat', 'Biología', 1, 'Ordena esta cadena alimentaria, del productor al consumidor final.', ['Pasto', 'Saltamontes', 'Rana', 'Serpiente'], 'La energía pasa del productor (pasto) a consumidores primarios, secundarios y terciarios.');
+  mc('nat', 'Biología', 2, '¿Qué molécula contiene la información genética de los seres vivos?', ['ADN', 'ATP', 'Glucosa', 'Hemoglobina'], 0, 'El ADN guarda las instrucciones para construir y hacer funcionar a un organismo.');
+  mt('nat', 'Biología', 2, 'Relaciona cada sistema del cuerpo con su función.', [['Respiratorio', 'Intercambia gases'], ['Digestivo', 'Descompone alimentos'], ['Circulatorio', 'Transporta sangre'], ['Nervioso', 'Envía señales']], 'Cada sistema cumple una tarea y trabajan coordinados.');
+  mc('nat', 'Biología', 2, 'En un ecosistema, los organismos que producen su propio alimento se llaman:', ['Consumidores', 'Descomponedores', 'Productores', 'Parásitos'], 2, 'Los productores, como las plantas, fabrican su alimento mediante la fotosíntesis.');
+  mc('nat', 'Biología', 3, 'Dos padres Aa (A dominante, a recesivo) tienen un hijo. ¿Qué probabilidad hay de que sea aa?', ['0 %', '25 %', '50 %', '75 %'], 1, 'El cruce Aa × Aa da AA, Aa, Aa y aa: un cuarto, es decir 25 %.');
+  mc('nat', 'Física', 1, '¿En qué unidad del Sistema Internacional se mide la fuerza?', ['Julio', 'Newton', 'Vatio', 'Pascal'], 1, 'La fuerza se mide en newton (N), en honor a Isaac Newton.');
+  fl('nat', 'Física', 2, 'Un auto recorre 150 km en 3 horas a velocidad constante. ¿Cuál es su velocidad en km/h?', ['50', '50 km/h'], 'Velocidad = distancia ÷ tiempo = 150 ÷ 3 = 50 km/h.');
+  mc('nat', 'Física', 2, '¿Cómo se llama la energía que tiene un cuerpo por estar en movimiento?', ['Potencial', 'Cinética', 'Térmica', 'Química'], 1, 'La energía cinética depende de la masa y de la velocidad del cuerpo.');
+  tf('nat', 'Física', 2, 'En el vacío, un objeto pesado cae más rápido que uno liviano.', false, 'Sin resistencia del aire, todos los cuerpos caen con la misma aceleración.');
+  tf('nat', 'Física', 2, 'La luz viaja más rápido que el sonido.', true, 'La luz recorre unos 300.000 km/s; el sonido en el aire, unos 340 m/s.');
+  mc('nat', 'Física', 3, 'Según F = m · a, ¿qué fuerza actúa sobre una masa de 5 kg con aceleración de 4 m/s²?', ['9 N', '1,25 N', '20 N', '45 N'], 2, 'F = 5 × 4 = 20 N.');
+  mc('nat', 'Física', 3, 'Según la ley de Ohm (V = I · R), ¿cuál es el voltaje si I = 2 A y R = 6 Ω?', ['3 V', '8 V', '12 V', '36 V'], 2, 'V = 2 × 6 = 12 V.');
+  mc('nat', 'Química', 1, '¿Cuál es el símbolo químico del oro?', ['Or', 'Au', 'Ag', 'Go'], 1, 'Au viene del latín aurum.');
+  fl('nat', 'Química', 1, '¿Cuál es el símbolo químico del sodio?', ['Na'], 'Na viene del latín natrium.');
+  mc('nat', 'Química', 2, '¿Cuál es la fórmula de la sal de mesa?', ['NaCl', 'KCl', 'H₂O', 'CO₂'], 0, 'La sal de mesa es cloruro de sodio: NaCl.');
+  mt('nat', 'Química', 2, 'Relaciona cada elemento con su símbolo.', [['Hierro', 'Fe'], ['Potasio', 'K'], ['Plata', 'Ag'], ['Oxígeno', 'O']], 'Algunos símbolos vienen del latín: Fe (ferrum), K (kalium), Ag (argentum).');
+  mc('nat', 'Química', 2, 'Una sustancia con pH 3 es:', ['Ácida', 'Neutra', 'Básica', 'Salina'], 0, 'El pH menor que 7 es ácido, 7 es neutro y mayor que 7 es básico.');
+  mc('nat', 'Química', 3, '¿Qué determina el número atómico de un elemento?', ['Sus neutrones', 'Sus electrones de valencia', 'Sus protones', 'Su masa total'], 2, 'El número atómico es el número de protones del núcleo.');
+  tf('nat', 'Química', 3, 'Una mezcla de agua y aceite es una mezcla homogénea.', false, 'No se mezclan por completo; se ven dos fases, por eso es heterogénea.');
+  mc('nat', 'Química', 3, '¿Qué gas liberan las plantas durante la fotosíntesis?', ['Dióxido de carbono', 'Nitrógeno', 'Oxígeno', 'Metano'], 2, 'Con luz, agua y CO₂ producen glucosa y liberan oxígeno.');
+  mc('nat', 'Medioambiente', 1, '¿Qué gas, liberado al quemar combustibles fósiles, aumenta el efecto invernadero?', ['Oxígeno', 'Dióxido de carbono', 'Helio', 'Nitrógeno'], 1, 'El CO₂ retiene calor en la atmósfera y contribuye al calentamiento global.');
+  tf('nat', 'Medioambiente', 1, 'Reciclar vidrio ayuda a reducir los residuos y el uso de materias primas.', true, 'El vidrio se puede reciclar muchas veces sin perder calidad.');
+  mc('nat', 'Medioambiente', 2, '¿Qué capa de la atmósfera nos protege de la radiación ultravioleta?', ['Troposfera', 'Capa de ozono', 'Ionosfera', 'Exosfera'], 1, 'La capa de ozono absorbe gran parte de los rayos UV del Sol.');
+  mc('nat', 'Medioambiente', 2, 'Colombia es reconocido como un país con gran:', ['Desierto', 'Biodiversidad', 'Nieve permanente', 'Tundra'], 1, 'Colombia es uno de los países megadiversos del planeta.');
+
+  /* ============ CIENCIAS SOCIALES ============ */
+  mc('soc', 'Historia de Colombia', 1, '¿En qué año ocurrió el Grito de Independencia en Santafé de Bogotá?', ['1492', '1810', '1886', '1991'], 1, 'El 20 de julio de 1810 se dio el Grito de Independencia.');
+  mc('soc', 'Historia de Colombia', 1, '¿Qué batalla de 1819 selló la independencia de Colombia?', ['Batalla de Boyacá', 'Batalla de Ayacucho', 'Batalla de Carabobo', 'Batalla de Junín'], 0, 'En el Puente de Boyacá, el 7 de agosto de 1819, triunfó el ejército patriota.');
+  mc('soc', 'Historia de Colombia', 1, '¿Cuál es el año de la Constitución que rige hoy en Colombia?', ['1886', '1991', '1948', '2000'], 1, 'La Constitución Política de 1991 reemplazó a la de 1886.');
+  od('soc', 'Historia de Colombia', 2, 'Ordena estos hechos de Colombia del más antiguo al más reciente.', ['Grito de Independencia', 'Batalla de Boyacá', 'Constitución de Cúcuta', 'Constitución de 1991'], 'Los hechos ocurrieron en 1810, 1819, 1821 y 1991.');
+  mc('soc', 'Historia de Colombia', 3, 'El Frente Nacional, acuerdo de alternancia entre liberales y conservadores, duró entre:', ['1930 y 1946', '1958 y 1974', '1948 y 1953', '1974 y 1990'], 1, 'Se estableció tras el plebiscito de 1957 y rigió de 1958 a 1974.');
+  mc('soc', 'Historia universal', 1, '¿En qué año comenzó la Primera Guerra Mundial?', ['1905', '1914', '1939', '1945'], 1, 'Empezó en 1914 y terminó en 1918.');
+  mc('soc', 'Historia universal', 2, '¿En qué año ocurrió la Revolución Francesa?', ['1648', '1776', '1789', '1815'], 2, 'Comenzó en 1789 con la toma de la Bastilla.');
+  mt('soc', 'Historia universal', 2, 'Relaciona cada personaje con su acontecimiento.', [['Cristóbal Colón', 'Llegó a América en 1492'], ['Napoleón Bonaparte', 'Emperador de Francia'], ['Mahatma Gandhi', 'Independencia de la India'], ['Nelson Mandela', 'Fin del apartheid']], 'Cada personaje marcó un momento clave de la historia.');
+  mc('soc', 'Historia universal', 2, '¿En qué año cayó el Muro de Berlín?', ['1961', '1975', '1989', '2001'], 2, 'Cayó el 9 de noviembre de 1989, símbolo del fin de la Guerra Fría.');
+  tf('soc', 'Historia universal', 3, 'La Guerra Fría fue un enfrentamiento militar directo y declarado entre Estados Unidos y la Unión Soviética.', false, 'Fue una tensión política, económica e ideológica con guerras indirectas, sin choque directo.');
+  mc('soc', 'Geografía', 1, '¿Cuál es la capital de Argentina?', ['Santiago', 'Montevideo', 'Buenos Aires', 'Lima'], 2, 'Buenos Aires es la capital y la ciudad más grande de Argentina.');
+  mc('soc', 'Geografía', 1, '¿Cuál es el continente más grande del mundo?', ['África', 'América', 'Asia', 'Europa'], 2, 'Asia ocupa cerca del 30 % de las tierras emergidas.');
+  tf('soc', 'Geografía', 1, 'Colombia tiene costas sobre el océano Pacífico y sobre el mar Caribe.', true, 'Es el único país de Suramérica con costas en ambos océanos.');
+  mt('soc', 'Geografía', 2, 'Relaciona cada país con su capital.', [['Perú', 'Lima'], ['Ecuador', 'Quito'], ['Brasil', 'Brasilia'], ['Chile', 'Santiago']], 'Brasilia es la capital de Brasil desde 1960, no Río de Janeiro.');
+  mc('soc', 'Geografía', 2, '¿Qué río desemboca en el mar Caribe cerca de Barranquilla?', ['Cauca', 'Magdalena', 'Amazonas', 'Orinoco'], 1, 'El río Magdalena es la principal arteria fluvial de Colombia.');
+  fl('soc', 'Geografía', 2, '¿Cuál es la capital de Australia?', ['canberra'], 'Canberra es la capital; Sídney es la ciudad más poblada.');
+  mc('soc', 'Geografía', 3, '¿Cómo se llama la línea imaginaria que divide la Tierra en hemisferio norte y sur?', ['Meridiano de Greenwich', 'Trópico de Cáncer', 'Ecuador', 'Círculo polar'], 2, 'El Ecuador está a 0° de latitud.');
+  mc('soc', 'Ciudadanía', 1, 'Los tres poderes del Estado colombiano son ejecutivo, legislativo y:', ['Militar', 'Judicial', 'Electoral', 'Económico'], 1, 'La rama judicial administra justicia.');
+  mc('soc', 'Ciudadanía', 2, '¿Qué mecanismo permite proteger rápidamente los derechos fundamentales?', ['Acción de tutela', 'Referendo', 'Cabildo abierto', 'Plebiscito'], 0, 'La tutela se resuelve en máximo 10 días.');
+  tf('soc', 'Ciudadanía', 2, 'Los derechos humanos aplican para todas las personas sin discriminación.', true, 'Son universales: nadie puede ser excluido por origen, género o creencias.');
+  mc('soc', 'Ciudadanía', 3, '¿A partir de qué edad se puede votar en Colombia?', ['16 años', '18 años', '21 años', '25 años'], 1, 'La ciudadanía y el derecho al voto se alcanzan a los 18 años.');
+  mc('soc', 'Cultura', 1, '¿Cuál es una danza tradicional de la región Caribe colombiana?', ['Cumbia', 'Tango', 'Samba', 'Flamenco'], 0, 'La cumbia mezcla raíces indígenas, africanas y europeas.');
+  mc('soc', 'Cultura', 2, '¿Qué festividad de Barranquilla es Patrimonio Cultural Inmaterial de la Humanidad?', ['Feria de las Flores', 'Carnaval de Barranquilla', 'Fiesta del Mar', 'Festival Vallenato'], 1, 'La UNESCO lo declaró patrimonio en 2003.');
+  mc('soc', 'Economía', 1, 'La agricultura y la minería pertenecen al sector económico:', ['Primario', 'Secundario', 'Terciario', 'Cuaternario'], 0, 'El sector primario extrae recursos de la naturaleza.');
+  mc('soc', 'Economía', 2, '¿Cómo se llama el aumento general y sostenido de los precios?', ['Deflación', 'Inflación', 'Ahorro', 'Devaluación'], 1, 'La inflación reduce el poder adquisitivo del dinero.');
+  tf('soc', 'Economía', 2, 'Si la demanda de un producto sube y la oferta no cambia, el precio tiende a subir.', true, 'Más compradores para la misma cantidad de producto presionan el precio hacia arriba.');
+  mc('soc', 'Economía', 3, 'El PIB (producto interno bruto) mide:', ['La deuda pública', 'El valor de bienes y servicios producidos en un país', 'El número de empleos', 'Las exportaciones únicamente'], 1, 'Es el valor total de lo producido en un país durante un periodo.');
+
+  /* ============ HUMANIDADES ============ */
+  mc('hum', 'Lenguaje', 1, '¿Cuál es un sinónimo de "feliz"?', ['Triste', 'Contento', 'Cansado', 'Enojado'], 1, 'Los sinónimos tienen significado parecido.');
+  mc('hum', 'Lenguaje', 1, '¿Cuál es el antónimo de "generoso"?', ['Amable', 'Egoísta', 'Valiente', 'Alegre'], 1, 'Los antónimos tienen significado opuesto.');
+  fl('hum', 'Lenguaje', 1, 'Completa con el verbo "ir" en pretérito: "Ayer yo ___ al parque."', ['fui'], 'Yo fui: pretérito perfecto simple de "ir".');
+  mc('hum', 'Lenguaje', 2, '¿Cuál palabra está bien escrita?', ['Exepción', 'Excepción', 'Escepción', 'Exsepción'], 1, 'Se escribe "excepción", con "xc".');
+  mc('hum', 'Lenguaje', 2, '"Tus ojos son dos luceros" es un ejemplo de:', ['Metáfora', 'Símil', 'Hipérbole', 'Onomatopeya'], 0, 'La metáfora identifica un elemento con otro sin usar "como".');
+  mc('hum', 'Lenguaje', 2, '"Es lento como una tortuga" es un ejemplo de:', ['Metáfora', 'Personificación', 'Símil', 'Ironía'], 2, 'El símil compara con "como", "cual" o "parece".');
+  mc('hum', 'Lenguaje', 2, '¿A qué género literario pertenece un poema escrito en versos?', ['Narrativo', 'Lírico', 'Dramático', 'Periodístico'], 1, 'El género lírico expresa sentimientos.');
+  tf('hum', 'Lenguaje', 2, 'Las palabras agudas llevan tilde cuando terminan en n, s o vocal.', true, 'Ejemplos: canción, café, compás.');
+  od('hum', 'Lenguaje', 2, 'Ordena las palabras para formar una oración.', ['María', 'lee', 'un', 'libro'], 'Orden básico en español: sujeto, verbo y complemento.');
+  mc('hum', 'Lenguaje', 2, 'Lee: "El río crecía cada tarde por la lluvia, y los vecinos aprendieron a guardar sus pertenencias en lo alto." ¿Por qué guardan sus cosas en lo alto?', ['Por una mudanza', 'Porque el río crecía con la lluvia', 'Porque había un robo', 'Por una fiesta'], 1, 'El texto dice que el río crecía por la lluvia.');
+  mc('hum', 'Lenguaje', 3, '¿Quién escribió "Cien años de soledad"?', ['Mario Vargas Llosa', 'Julio Cortázar', 'Gabriel García Márquez', 'Jorge Isaacs'], 2, 'Gabriel García Márquez la publicó en 1967 y ganó el Nobel en 1982.');
+  mc('hum', 'Lenguaje', 3, 'En "Compramos pan en la tienda", ¿cuál es el sujeto?', ['Pan', 'Tienda', 'Nosotros (tácito)', 'Compramos'], 2, 'El verbo en primera persona plural indica el sujeto tácito "nosotros".');
+  mc('hum', 'Lenguaje', 3, '"Te lo he dicho mil veces" es un ejemplo de:', ['Hipérbole', 'Metáfora', 'Símil', 'Aliteración'], 0, 'La hipérbole exagera una idea para darle fuerza.');
+  mc('hum', 'Inglés', 1, 'What does "apple" mean in Spanish?', ['Naranja', 'Manzana', 'Pera', 'Uva'], 1, '"Apple" significa manzana.');
+  fl('hum', 'Inglés', 1, 'Translate "house" into Spanish.', ['casa', 'la casa'], '"House" significa casa.');
+  mc('hum', 'Inglés', 1, 'Choose the correct word: "She ___ a student."', ['am', 'is', 'are', 'be'], 1, 'Con she / he / it se usa "is".');
+  mc('hum', 'Inglés', 2, 'What is the past tense of "go"?', ['Goed', 'Gone', 'Went', 'Going'], 2, '"Go" es un verbo irregular: go → went → gone.');
+  fl('hum', 'Inglés', 2, 'Complete: "I ___ happy today." (verb to be)', ['am', "i'm"], 'Con "I" se usa "am".');
+  od('hum', 'Inglés', 2, 'Order the words to make a sentence.', ['She', 'goes', 'to', 'school'], 'Orden: sujeto + verbo + complemento.');
+  mt('hum', 'Inglés', 2, 'Match each English word with its Spanish translation.', [['Dog', 'Perro'], ['Book', 'Libro'], ['Window', 'Ventana'], ['Friend', 'Amigo']], 'Vocabulario cotidiano.');
+  mc('hum', 'Inglés', 2, 'Find the error: "He don\'t like pizza."', ['"He" is wrong', '"don\'t" should be "doesn\'t"', '"like" should be "likes"', '"pizza" is wrong'], 1, 'Con he/she/it se usa "doesn\'t" en negativas del presente.');
+  tf('hum', 'Inglés', 2, '"Their" and "there" mean the same thing.', false, '"Their" indica posesión y "there" indica lugar.');
+  mc('hum', 'Inglés', 2, 'How do you say "Tengo hambre" in English?', ['I am hungry', 'I have hunger', 'I am hunger', 'I hungry'], 0, 'En inglés se usa "to be": I am hungry.');
+  mc('hum', 'Inglés', 3, 'Choose the correct form: "If I ___ rich, I would travel the world."', ['am', 'was being', 'were', 'will be'], 2, 'En condicionales irreales se usa "were".');
+  mc('hum', 'Inglés', 3, 'Reading: "Tom wakes up at 6. He eats breakfast and takes the bus to school." How does Tom go to school?', ['By bus', 'By car', 'On foot', 'By bike'], 0, 'El texto dice "takes the bus".');
+  fl('hum', 'Inglés', 3, 'Complete with the present perfect: "She has ___ her homework." (finish)', ['finished'], 'Present perfect: have/has + participio pasado.');
+
+  /* ============ ARTES ============ */
+  mc('art', 'Música', 1, '¿Cuál de estos instrumentos es de cuerda frotada?', ['Violín', 'Flauta', 'Tambor', 'Trompeta'], 0, 'El violín suena al frotar las cuerdas con un arco.');
+  mc('art', 'Música', 1, '¿Cuántas notas musicales básicas existen?', ['5', '7', '8', '12'], 1, 'Do, Re, Mi, Fa, Sol, La y Si.');
+  mt('art', 'Música', 1, 'Relaciona cada instrumento con su familia.', [['Violín', 'Cuerda'], ['Tambor', 'Percusión'], ['Flauta', 'Viento'], ['Piano', 'Teclado']], 'Los instrumentos se agrupan según cómo producen el sonido.');
+  mc('art', 'Música', 2, '¿Qué instrumentos caracterizan al vallenato tradicional?', ['Acordeón, caja y guacharaca', 'Guitarra eléctrica y batería', 'Arpa y cuatro', 'Violín y chelo'], 0, 'Acordeón, caja vallenata y guacharaca forman el trío tradicional.');
+  mc('art', 'Música', 2, 'En compás de 4/4, ¿cuántos tiempos dura una blanca?', ['1', '2', '3', '4'], 1, 'Blanca = 2 tiempos; negra = 1; redonda = 4.');
+  od('art', 'Música', 2, 'Ordena las notas para formar la escala ascendente.', ['Sol', 'Do', 'Fa', 'Mi', 'Re'], 'La escala es Do, Re, Mi, Fa, Sol.');
+  tf('art', 'Música', 2, 'La cumbia nació de la mezcla de culturas indígenas, africanas y europeas.', true, 'Es un símbolo del mestizaje cultural colombiano.');
+  mc('art', 'Música', 3, 'En compás de 4/4, ¿cuántos tiempos tiene cada compás?', ['2', '3', '4', '6'], 2, 'El numerador indica los tiempos por compás.');
+  mc('art', 'Música', 3, 'El término "allegro" en una partitura indica un tempo:', ['Lento', 'Moderado', 'Rápido', 'Silencio'], 2, 'Allegro significa vivo y rápido.');
+  fl('art', 'Música', 3, 'Patrón rítmico en 4/4: negra + negra + blanca. ¿Cuántos tiempos suman?', ['4'], '1 + 1 + 2 = 4 tiempos.');
+  mc('art', 'Música', 3, 'Completa el compás de 4/4: blanca + negra + ___', ['Redonda', 'Negra', 'Blanca', 'Silencio de redonda'], 1, 'Blanca (2) + negra (1) + negra (1) = 4 tiempos.');
+  mc('art', 'Música', 3, '¿Cuántas líneas tiene un pentagrama?', ['4', '5', '6', '7'], 1, 'Penta significa cinco.');
+  mc('art', 'Educación física', 1, '¿Cuántos jugadores por equipo hay en la cancha en un partido de fútbol?', ['9', '10', '11', '12'], 2, 'Cada equipo juega con 11, incluido el portero.');
+  mc('art', 'Educación física', 1, '¿Cuántos jugadores de un equipo de baloncesto están en cancha a la vez?', ['4', '5', '6', '7'], 1, 'Cinco por equipo.');
+  mc('art', 'Educación física', 1, '¿Cuántos jugadores por equipo hay en cancha en voleibol?', ['5', '6', '7', '8'], 1, 'Son seis jugadores por equipo.');
+  tf('art', 'Educación física', 2, 'En baloncesto se puede caminar con el balón en las manos sin driblar.', false, 'Eso es "pasos": una violación del reglamento.');
+  mc('art', 'Educación física', 2, '¿Cuánto dura un partido de fútbol profesional (sin adición)?', ['60 minutos', '80 minutos', '90 minutos', '120 minutos'], 2, 'Dos tiempos de 45 minutos.');
+  mc('art', 'Educación física', 2, '¿Cuál capacidad física permite mover las articulaciones con amplitud?', ['Fuerza', 'Resistencia', 'Flexibilidad', 'Velocidad'], 2, 'La flexibilidad depende de articulaciones, músculos y tendones.');
+  mc('art', 'Educación física', 2, '¿Para qué sirve el calentamiento antes del ejercicio?', ['Para cansarse más rápido', 'Para preparar el cuerpo y prevenir lesiones', 'Para sustituir la hidratación', 'No sirve para nada'], 1, 'Aumenta la temperatura muscular y el ritmo cardíaco gradualmente.');
+  tf('art', 'Educación física', 2, 'El juego limpio implica respetar las reglas, a los compañeros y a los rivales.', true, 'La deportividad es parte esencial del deporte.');
+  od('art', 'Educación física', 2, 'Ordena las partes de una sesión de ejercicio.', ['Calentamiento', 'Parte principal', 'Vuelta a la calma'], 'Primero se prepara el cuerpo, luego se trabaja y al final se relaja.');
+  mc('art', 'Educación física', 3, '¿Cuál es el hueso más largo del cuerpo humano?', ['Húmero', 'Tibia', 'Fémur', 'Radio'], 2, 'El fémur está en el muslo.');
+  mc('art', 'Educación física', 3, '¿Qué músculo principal flexiona el codo?', ['Tríceps', 'Bíceps', 'Deltoides', 'Pectoral'], 1, 'El bíceps braquial flexiona el codo.');
+  mc('art', 'Educación física', 3, '¿Cuántos puntos vale un tiro de larga distancia desde detrás de la línea en baloncesto?', ['1', '2', '3', '4'], 2, 'El triple vale 3 puntos.');
+  mt('art', 'Educación física', 3, 'Relaciona cada deporte con un elemento propio.', [['Voleibol', 'Red'], ['Baloncesto', 'Aro'], ['Fútbol', 'Portería'], ['Natación', 'Piscina']], 'Cada deporte tiene su propio escenario y material.');
+
+  S.QUESTIONS = Q;
+  S.qById = Object.fromEntries(Q.map(q => [q.id, q]));
+})(window.S = window.S || {});
+
+/* Saberium — núcleo: utilidades, iconos, almacenamiento, audio, efectos */
+(function (S) {
+  'use strict';
+
+  /* ---------- utilidades ---------- */
+  const $ = (s, r) => (r || document).querySelector(s);
+  const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const rnd = n => Math.floor(Math.random() * n);
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const dateKey = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+  const field = id => S.FIELDS.find(f => f.id === id);
+  const fmt = n => Math.round(n).toLocaleString('es-CO');
+  const hash = str => { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
+  Object.assign(S, { $, $$, esc, shuffle, rnd, clamp, dateKey, field, fmt, hash });
+
+  /* ---------- iconos ---------- */
+  const P = {
+    mat: '<path d="M4 7h7M7.5 3.5v7M13 7h7M4.5 15.5l5 5M9.5 15.5l-5 5M14 16h6M14 19h6"/>',
+    nat: '<path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3M8 15h8"/>',
+    soc: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/>',
+    hum: '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2zM4 21V5M9 8h6"/>',
+    art: '<path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>',
+    heart: '<path d="M12 21s-8-5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6-8 11-8 11z"/>',
+    coin: '<circle cx="12" cy="12" r="9"/><path d="M12 7v10M9.5 9.5h4a1.5 1.5 0 0 1 0 3h-3a1.5 1.5 0 0 0 0 3h4"/>',
+    star: '<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
+    lock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+    bolt: '<path d="M13 2L5 14h6l-1 8 8-12h-6z"/>',
+    flame: '<path d="M12 22c4 0 7-2.8 7-7 0-3-2-5-3-7-1 2-2 2.5-3 2.5 0-3-1-6-4-8 0 4-4 6-4 12 0 4 3 7.5 7 7.5z"/>',
+    pause: '<path d="M8 5v14M16 5v14"/>',
+    back: '<path d="M15 5l-7 7 7 7"/>',
+    check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+    x: '<path d="M6 6l12 12M18 6L6 18"/>',
+    up: '<path d="M6 15l6-6 6 6"/>',
+    down: '<path d="M6 9l6 6 6-6"/>',
+    trophy: '<path d="M7 4h10v5a5 5 0 0 1-10 0zM7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3M12 14v4M8 21h8M10 18h4"/>',
+    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    play: '<path d="M7 4l13 8-13 8z"/>',
+    map: '<path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2zM9 4v14M15 6v14"/>',
+    target: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>',
+    shuffle: '<path d="M3 7h4l10 10h4M3 17h4l3-3M14 10l3-3h4M18 4l3 3-3 3M18 14l3 3-3 3"/>',
+    gift: '<rect x="3" y="9" width="18" height="12" rx="1"/><path d="M12 9v12M3 13h18M12 9c-2 0-5-1-5-3s3-2 5 3c2-5 5-5 5-3s-3 3-5 3"/>',
+    cart: '<path d="M3 4h3l2 12h11l2-8H7"/><circle cx="10" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/>',
+    chart: '<path d="M4 20V4M4 20h16M8 16v-5M12 16V8M16 16v-8"/>',
+    user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',
+    gear: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/>',
+    swap: '<path d="M4 8h14l-3-3M20 16H6l3 3"/>',
+    rocket: '<path d="M12 2c3 2 5 6 5 10l-2 4H9l-2-4c0-4 2-8 5-10zM9 16l-3 4 4-1M15 16l3 4-4-1"/><circle cx="12" cy="10" r="1.6"/>',
+    owl: '<path d="M5 5l4 2h6l4-2v9a7 7 0 0 1-14 0z"/><circle cx="9.5" cy="11" r="1.5"/><circle cx="14.5" cy="11" r="1.5"/><path d="M12 13l-1 2h2z"/>',
+    fox: '<path d="M3 4l5 3h8l5-3-1 9-8 8-8-8z"/><path d="M9 12h.01M15 12h.01M11 16h2"/>',
+    robot: '<rect x="5" y="8" width="14" height="11" rx="2"/><path d="M12 8V4M9 13h.01M15 13h.01M9 17h6"/><circle cx="12" cy="3.5" r="1"/>',
+    planet: '<circle cx="12" cy="12" r="5"/><path d="M3 15c-1-2 4-7 12-9M21 9c1 2-4 7-12 9"/>',
+    dragon: '<path d="M4 18c0-6 4-12 10-12 3 0 6 2 6 5s-3 4-5 3c-1 4-6 6-11 4z"/><path d="M16 9h.01"/>',
+    eye: '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'
+  };
+  const icon = (n, cls) => `<svg class="ic ${cls || ''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${P[n] || ''}</svg>`;
+  S.icon = icon;
+  S.logoMark = () => {
+    const cols = S.FIELDS.map(f => f.color);
+    const c = [50, 50], R = 46, pts = [];
+    for (let i = 0; i < 5; i++) { const a = -Math.PI / 2 + i * 2 * Math.PI / 5; pts.push([c[0] + R * Math.cos(a), c[1] + R * Math.sin(a)]); }
+    let s = '';
+    for (let i = 0; i < 5; i++) { const a = pts[i], b = pts[(i + 1) % 5]; s += `<polygon points="${c} ${a} ${b}" fill="${cols[i]}" stroke="#0D0F1E" stroke-width="2" stroke-linejoin="round"/>`; }
+    return `<svg class="logo-mark" viewBox="0 0 100 100" aria-hidden="true">${s}</svg>`;
+  };
+
+  /* ---------- almacenamiento ---------- */
+  const KEY = 'saberium_v1';
+  const defSettings = () => ({ sfx: true, music: false, vol: 0.6, reduce: false, large: false, contrast: false });
+  let db = null;
+  function load() {
+    try { const r = localStorage.getItem(KEY); db = r ? JSON.parse(r) : null; } catch (e) { db = null; }
+    if (!db || typeof db !== 'object') db = { players: {}, current: null, settings: defSettings() };
+    db.players = db.players || {};
+    db.settings = Object.assign(defSettings(), db.settings || {});
+    if (db.current && !db.players[db.current]) db.current = null;
+  }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(db)); } catch (e) { /* sin almacenamiento: se juega en memoria */ } }
+  load();
+
+  S.ITEMS = {
+    avatar: [
+      { id: 'rocket', name: 'Cohete', price: 0 }, { id: 'owl', name: 'Búho', price: 0 }, { id: 'fox', name: 'Zorro', price: 0 },
+      { id: 'robot', name: 'Robot', price: 60 }, { id: 'planet', name: 'Planeta', price: 90 },
+      { id: 'bolt', name: 'Rayo', price: 120 }, { id: 'dragon', name: 'Dragón', price: 200 }],
+    frame: [
+      { id: 'none', name: 'Sin marco', price: 0 }, { id: 'gold', name: 'Marco dorado', price: 80 },
+      { id: 'neon', name: 'Marco neón', price: 140 }, { id: 'rainbow', name: 'Marco prisma', price: 250 }],
+    bg: [
+      { id: 'aurora', name: 'Aurora', price: 0 }, { id: 'dusk', name: 'Atardecer', price: 100 },
+      { id: 'neon', name: 'Ciudad neón', price: 160 }, { id: 'forest', name: 'Bosque', price: 120 }],
+    title: [
+      { id: 'novato', name: 'Explorador novato', price: 0 }, { id: 'curioso', name: 'Mente curiosa', price: 50 },
+      { id: 'estratega', name: 'Estratega', price: 110 }, { id: 'sabio', name: 'Sabio del Cristal', price: 300 }]
+  };
+  S.ITEM_CATS = { avatar: 'Avatares', frame: 'Marcos', bg: 'Fondos', title: 'Títulos' };
+
+  S.store = {
+    get db() { return db; },
+    save, settings: () => db.settings,
+    players: () => Object.values(db.players),
+    cur: () => db.current ? db.players[db.current] : null,
+    select(id) { db.current = id; save(); },
+    logout() { db.current = null; save(); },
+    create(name, avatar) {
+      const id = 'p' + Date.now().toString(36) + rnd(999);
+      db.players[id] = {
+        id, name: name.trim().slice(0, 16), xp: 0, coins: 0, totalCoins: 0, created: Date.now(),
+        stats: { games: 0, answered: 0, correct: 0, bestStreak: 0, perfect: 0, timedBest: 0, finalWins: 0, fields: {}, subjects: {} },
+        best: {}, adv: {}, ach: {}, recent: [], seen: {},
+        owned: { avatar: ['rocket', 'owl', 'fox'], frame: ['none'], bg: ['aurora'], title: ['novato'] },
+        equipped: { avatar: avatar || 'rocket', frame: 'none', bg: 'aurora', title: 'novato' },
+        missions: { date: '', list: [], bonus: false }, counters: { bought: 0, missionsDone: 0 }
+      };
+      db.current = id; save(); return db.players[id];
+    },
+    remove(id) { delete db.players[id]; if (db.current === id) db.current = null; save(); },
+    reset(id) { const p = db.players[id]; if (!p) return null; const n = p.name; delete db.players[id]; db.current = null; return S.store.create(n, 'rocket'); },
+    wipe() { db = { players: {}, current: null, settings: defSettings() }; save(); }
+  };
+
+  /* nivel y experiencia: nivel n requiere 60·(n−1)² puntos acumulados */
+  S.levelOf = xp => Math.floor(Math.sqrt(Math.max(0, xp) / 60)) + 1;
+  S.xpFor = lvl => 60 * (lvl - 1) * (lvl - 1);
+  S.levelInfo = xp => {
+    const l = S.levelOf(xp), a = S.xpFor(l), b = S.xpFor(l + 1);
+    return { level: l, into: xp - a, need: b - a, pct: clamp((xp - a) / (b - a) * 100, 0, 100) };
+  };
+
+  /* ---------- audio ---------- */
+  const A = { ctx: null, master: null, musicOn: false, timer: null, step: 0 };
+  A.init = function () {
+    if (A.ctx) { if (A.ctx.state === 'suspended') A.ctx.resume(); return true; }
+    try {
+      const C = window.AudioContext || window.webkitAudioContext;
+      if (!C) return false;
+      A.ctx = new C(); A.master = A.ctx.createGain(); A.master.connect(A.ctx.destination); A.setVol();
+      return true;
+    } catch (e) { return false; }
+  };
+  A.setVol = function () { if (A.master) A.master.gain.value = clamp(db.settings.vol, 0, 1) * 0.5; };
+  A.tone = function (f, dur, type, vol, delay) {
+    if (!A.ctx) return;
+    try {
+      const t = A.ctx.currentTime + (delay || 0), o = A.ctx.createOscillator(), g = A.ctx.createGain();
+      o.type = type || 'sine'; o.frequency.setValueAtTime(f, t);
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol || 0.3, t + 0.015);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g); g.connect(A.master); o.start(t); o.stop(t + dur + 0.05);
+    } catch (e) { /* ignorar */ }
+  };
+  const SFX = {
+    click: () => A.tone(520, 0.06, 'triangle', 0.15),
+    ok: () => { A.tone(660, 0.12, 'triangle', 0.3); A.tone(880, 0.18, 'triangle', 0.3, 0.1); },
+    bad: () => { A.tone(220, 0.18, 'sawtooth', 0.18); A.tone(165, 0.25, 'sawtooth', 0.18, 0.12); },
+    done: () => [523, 659, 784, 1047].forEach((f, i) => A.tone(f, 0.2, 'triangle', 0.28, i * 0.1)),
+    lose: () => [392, 330, 262, 196].forEach((f, i) => A.tone(f, 0.28, 'triangle', 0.25, i * 0.16)),
+    level: () => [392, 523, 659, 784, 1047, 1319].forEach((f, i) => A.tone(f, 0.22, 'square', 0.16, i * 0.08)),
+    ach: () => { A.tone(880, 0.12, 'sine', 0.3); A.tone(1175, 0.12, 'sine', 0.3, 0.12); A.tone(1568, 0.3, 'sine', 0.3, 0.24); },
+    coin: () => { A.tone(1200, 0.08, 'square', 0.12); A.tone(1600, 0.16, 'square', 0.12, 0.07); }
+  };
+  A.play = function (n) { if (!db.settings.sfx) return; if (!A.init()) return; if (SFX[n]) SFX[n](); };
+  const MELODY = [0, 4, 7, 9, 7, 4, 2, 4, 0, 4, 7, 12, 9, 7, 4, 2];
+  const BASS = [0, 0, 0, 0, -5, -5, -5, -5, -3, -3, -3, -3, -5, -5, -7, -7];
+  A.music = function (on) {
+    clearInterval(A.timer); A.timer = null; A.musicOn = false;
+    if (!on) return;
+    if (!A.init()) return;
+    A.musicOn = true;
+    const base = 261.63;
+    A.timer = setInterval(() => {
+      if (!db.settings.music || document.hidden) return;
+      const i = A.step++ % 16, f = base * Math.pow(2, MELODY[i] / 12), b = base / 2 * Math.pow(2, BASS[i] / 12);
+      A.tone(f, 0.28, 'triangle', 0.06);
+      if (i % 4 === 0) A.tone(b, 0.5, 'sine', 0.1);
+    }, 260);
+  };
+  S.audio = A;
+
+  /* ---------- efectos ---------- */
+  S.applyPrefs = function () {
+    const s = db.settings, r = document.documentElement, p = S.store.cur();
+    r.classList.toggle('reduce', !!s.reduce); r.classList.toggle('large', !!s.large); r.classList.toggle('contrast', !!s.contrast);
+    document.body.dataset.bg = p ? p.equipped.bg : 'aurora';
+  };
+  S.reduced = () => db.settings.reduce || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+  let fxc, fxx, parts = [], raf = 0;
+  function frame() {
+    fxx.clearRect(0, 0, fxc.width, fxc.height);
+    parts.forEach(p => { p.vy += 0.12; p.x += p.vx; p.y += p.vy; p.r += p.vr; p.life--; fxx.save(); fxx.translate(p.x, p.y); fxx.rotate(p.r); fxx.fillStyle = p.c; fxx.globalAlpha = Math.min(1, p.life / 30); fxx.fillRect(-p.s / 2, -p.s / 3, p.s, p.s * 0.6); fxx.restore(); });
+    parts = parts.filter(p => p.life > 0 && p.y < fxc.height + 20);
+    raf = parts.length ? requestAnimationFrame(frame) : 0;
+    if (!parts.length) fxx.clearRect(0, 0, fxc.width, fxc.height);
+  }
+  S.confetti = function (n, x, y) {
+    if (S.reduced()) return;
+    fxc = fxc || $('#fx'); if (!fxc) return;
+    fxc.width = innerWidth; fxc.height = innerHeight; fxx = fxc.getContext('2d');
+    const cols = S.FIELDS.map(f => f.color).concat(['#FFC83D']);
+    for (let i = 0; i < (n || 80); i++) {
+      const a = Math.random() * Math.PI * 2, v = 3 + Math.random() * 7;
+      parts.push({ x: x != null ? x : innerWidth / 2, y: y != null ? y : innerHeight * 0.35, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 4, r: Math.random() * 6, vr: (Math.random() - .5) * .4, s: 6 + Math.random() * 8, c: cols[rnd(cols.length)], life: 90 + rnd(60) });
+    }
+    if (!raf) raf = requestAnimationFrame(frame);
+  };
+
+  const toastQ = [];
+  S.toast = function (html, kind) {
+    const box = $('#toasts'); if (!box) return;
+    const t = document.createElement('div'); t.className = 'toast ' + (kind || '');
+    t.innerHTML = html; box.appendChild(t);
+    setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 400); }, 3200);
+  };
+  void toastQ;
+})(window.S = window.S || {});
+
+/* Saberium — progreso: logros, misiones, recompensas, selección de preguntas */
+(function (S) {
+  'use strict';
+  const { shuffle, hash, dateKey, field } = S;
+
+  /* ---------- logros ---------- */
+  const worldDone = (p, f) => [0, 1, 2].every(l => (p.adv[f + '-' + l] || 0) > 0);
+  S.ACHIEVEMENTS = [
+    { id: 'first', name: 'Primer paso', desc: 'Termina tu primera partida.', test: p => p.stats.games >= 1 },
+    { id: 'streak5', name: 'En racha', desc: 'Acierta 5 preguntas seguidas.', test: p => p.stats.bestStreak >= 5 },
+    { id: 'streak10', name: 'Imparable', desc: 'Acierta 10 preguntas seguidas.', test: p => p.stats.bestStreak >= 10 },
+    { id: 'perfect', name: 'Partida perfecta', desc: 'Termina una partida de 5 o más preguntas sin errores.', test: p => p.stats.perfect >= 1 },
+    { id: 'correct50', name: 'Cincuenta aciertos', desc: 'Acumula 50 respuestas correctas.', test: p => p.stats.correct >= 50 },
+    { id: 'correct200', name: 'Doscientos aciertos', desc: 'Acumula 200 respuestas correctas.', test: p => p.stats.correct >= 200 },
+    { id: 'lvl5', name: 'Nivel 5', desc: 'Alcanza el nivel 5.', test: p => S.levelOf(p.xp) >= 5 },
+    { id: 'lvl10', name: 'Nivel 10', desc: 'Alcanza el nivel 10.', test: p => S.levelOf(p.xp) >= 10 },
+    { id: 'coins100', name: 'Pequeño tesoro', desc: 'Gana 100 monedas en total.', test: p => p.totalCoins >= 100 },
+    { id: 'timed', name: 'Contra el tiempo', desc: 'Logra 12 aciertos en una partida contra el reloj.', test: p => p.stats.timedBest >= 12 },
+    { id: 'final', name: 'Campeón final', desc: 'Supera el Desafío final.', test: p => p.stats.finalWins >= 1 },
+    { id: 'shopper', name: 'Primer estilo', desc: 'Compra un objeto en la tienda.', test: p => p.counters.bought >= 1 },
+    { id: 'missions', name: 'Constante', desc: 'Completa 5 misiones diarias.', test: p => p.counters.missionsDone >= 5 },
+    ...S.FIELDS.map(f => ({ id: 'world_' + f.id, name: 'Maestro de ' + f.world, desc: 'Supera los 3 niveles de ' + f.name + ' en Aventura.', medal: f.color, test: p => worldDone(p, f.id) })),
+    { id: 'allworlds', name: 'Cristal completo', desc: 'Completa los cinco mundos de Aventura.', test: p => S.FIELDS.every(f => worldDone(p, f.id)) }
+  ];
+  S.checkAchievements = function (p) {
+    const fresh = [];
+    S.ACHIEVEMENTS.forEach(a => {
+      if (!p.ach[a.id] && a.test(p)) {
+        p.ach[a.id] = Date.now(); p.coins += 20; p.totalCoins += 20; fresh.push(a);
+      }
+    });
+    if (fresh.length) { S.audio.play('ach'); fresh.forEach(a => S.toast(`<b>Logro desbloqueado</b><span>${S.esc(a.name)} · +20 monedas</span>`, 'ach')); }
+    return fresh;
+  };
+
+  /* ---------- misiones diarias ---------- */
+  S.MISSION_POOL = [
+    { id: 'm_correct', text: 'Acierta 15 preguntas', goal: 15, metric: 'correct', coins: 15, xp: 40 },
+    { id: 'm_games', text: 'Termina 3 partidas', goal: 3, metric: 'games', coins: 12, xp: 30 },
+    { id: 'm_streak', text: 'Logra una racha de 5 aciertos', goal: 5, metric: 'streak', coins: 15, xp: 40 },
+    { id: 'm_points', text: 'Suma 150 puntos', goal: 150, metric: 'points', coins: 15, xp: 35 },
+    { id: 'm_perfect', text: 'Termina una partida sin errores', goal: 1, metric: 'perfect', coins: 20, xp: 50 },
+    { id: 'm_timed', text: 'Juega una partida Contra el reloj', goal: 1, metric: 'timed', coins: 10, xp: 25 },
+    ...S.FIELDS.map(f => ({ id: 'm_f_' + f.id, text: 'Acierta 6 preguntas de ' + f.name, goal: 6, metric: 'field:' + f.id, coins: 14, xp: 35 }))
+  ];
+  S.ensureMissions = function (p) {
+    const d = dateKey();
+    if (p.missions.date === d && p.missions.list.length) return p.missions;
+    const pool = S.MISSION_POOL.slice(), seed = hash(d + p.id), picks = [];
+    let s = seed;
+    while (picks.length < 3) { s = (Math.imul(s, 1664525) + 1013904223) >>> 0; picks.push(pool.splice(s % pool.length, 1)[0]); }
+    p.missions = { date: d, bonus: false, list: picks.map(m => ({ id: m.id, progress: 0, claimed: false })) };
+    S.store.save();
+    return p.missions;
+  };
+  S.missionDef = id => S.MISSION_POOL.find(m => m.id === id);
+  S.missionEvent = function (p, metric, amount) {
+    const ms = S.ensureMissions(p);
+    ms.list.forEach(m => {
+      const def = S.missionDef(m.id); if (!def || def.metric !== metric) return;
+      m.progress = metric === 'streak' ? Math.max(m.progress, amount) : m.progress + amount;
+    });
+  };
+  S.claimMission = function (p, idx) {
+    const ms = S.ensureMissions(p), m = ms.list[idx], def = m && S.missionDef(m.id);
+    if (!m || m.claimed || m.progress < def.goal) return false;
+    m.claimed = true; p.counters.missionsDone++; S.addCoins(p, def.coins); p.xp += def.xp;
+    S.audio.play('coin');
+    S.checkAchievements(p); S.store.save(); return true;
+  };
+  S.claimBonus = function (p) {
+    const ms = S.ensureMissions(p);
+    if (ms.bonus || !ms.list.every(m => m.claimed)) return false;
+    ms.bonus = true; S.addCoins(p, 30); p.xp += 60; S.audio.play('coin'); S.store.save(); return true;
+  };
+  S.addCoins = (p, n) => { p.coins += n; p.totalCoins += Math.max(0, n); };
+
+  /* ---------- selección de preguntas ---------- */
+  S.pickQuestions = function (p, filter, n, opts) {
+    opts = opts || {};
+    let pool = S.QUESTIONS.filter(filter);
+    const rec = new Set(p.recent || []);
+    pool = shuffle(pool);
+    pool.sort((a, b) => (rec.has(a.id) ? 1 : 0) - (rec.has(b.id) ? 1 : 0));   // primero las no vistas
+    if (opts.sortDiff) { const head = pool.slice(0, n); head.sort((a, b) => a.d - b.d); return head; }
+    return pool.slice(0, n);
+  };
+  S.rememberQuestions = function (p, ids) {
+    p.recent = (p.recent || []).filter(i => !ids.includes(i)).concat(ids).slice(-70);
+  };
+  /* Prepara las preguntas de una partida según su configuración. */
+  S.buildQuestions = function (p, cfg) {
+    const diffOk = q => !cfg.diff || cfg.diff === 0 || q.d === cfg.diff;
+    switch (cfg.mode) {
+      case 'adventure': {
+        const lvl = cfg.level + 1, base = q => q.f === cfg.field;
+        let qs = S.pickQuestions(p, q => base(q) && q.d === lvl, 7);
+        if (qs.length < 7) {
+          const used = new Set(qs.map(q => q.id));
+          const extra = S.pickQuestions(p, q => base(q) && !used.has(q.id) && Math.abs(q.d - lvl) === 1, 7 - qs.length);
+          qs = qs.concat(extra);
+        }
+        return shuffle(qs);
+      }
+      case 'quick': return S.pickQuestions(p, diffOk, 10);
+      case 'practice': return S.pickQuestions(p, q => q.f === cfg.field && (!cfg.subject || q.s === cfg.subject) && diffOk(q), 10);
+      case 'timed': return shuffle(S.QUESTIONS.filter(diffOk));
+      case 'mixed': {
+        let out = [];
+        S.FIELDS.forEach(f => { out = out.concat(S.pickQuestions(p, q => q.f === f.id && diffOk(q), 3)); });
+        return out.sort((a, b) => a.d - b.d || Math.random() - .5);
+      }
+      case 'final': {
+        const used = new Set();
+        const take = (types, n) => {
+          const r = S.pickQuestions(p, q => !used.has(q.id) && types.includes(q.t) && q.d >= 2, n);
+          r.forEach(q => used.add(q.id)); return r;
+        };
+        const r1 = take(['mc', 'tf'], 5), r2 = take(['fill'], 4), r3 = take(['match', 'order'], 3);
+        const list = r1.concat(r2, r3);
+        list.rounds = [r1.length, r2.length, r3.length];
+        return list;
+      }
+    }
+    return [];
+  };
+})(window.S);
+
+/* Saberium — motor de partida */
+(function (S) {
+  'use strict';
+  const { $, $$, esc, shuffle, field, icon } = S;
+
+  S.MODES = {
+    adventure: { name: 'Aventura', icon: 'map', lives: 3, color: '#4C8DFF', short: 'Cinco mundos, tres niveles cada uno.',
+      rules: ['Cada nivel tiene 7 retos de un solo campo.', 'Tienes 3 vidas: cada error cuesta una.', 'Si terminas con vidas, ganas de 1 a 3 estrellas y se abre el siguiente nivel.'] },
+    quick: { name: 'Desafío rápido', icon: 'bolt', lives: 3, color: '#FFC83D', short: '10 preguntas al azar de todas las áreas.',
+      rules: ['10 preguntas aleatorias de los cinco campos.', 'Tienes 3 vidas.', 'Terminas con al menos una vida y ganas el desafío.'] },
+    practice: { name: 'Modo práctica', icon: 'target', lives: 0, color: '#2ED98A', short: 'Elige materia y practica sin presión.',
+      rules: ['Elige campo, materia y dificultad.', 'Sin vidas y sin límite de tiempo.', 'Recibes la mitad de puntos y no ganas monedas.'] },
+    timed: { name: 'Contra el reloj', icon: 'clock', lives: 0, time: 60, penalty: 5, goal: 10, color: '#FF5C7A', short: '60 segundos: responde todo lo que puedas.',
+      rules: ['Tienes 60 segundos en total.', 'Cada error resta 5 segundos.', 'Con 10 aciertos o más superas el reto.'] },
+    mixed: { name: 'Reto mixto', icon: 'shuffle', lives: 3, color: '#F25CC1', short: '15 retos: 3 de cada campo, de fácil a difícil.',
+      rules: ['15 retos: tres de cada uno de los cinco campos.', 'La dificultad sube poco a poco.', 'Tienes 3 vidas y ganas si terminas con alguna.'] },
+    final: { name: 'Desafío final', icon: 'trophy', lives: 3, color: '#A98BFF', short: 'Tres rondas con distintos tipos de reto.',
+      rules: ['Ronda 1: selección múltiple y verdadero o falso.', 'Ronda 2: completar y resolver problemas.', 'Ronda 3: relacionar y ordenar.', 'Tienes 3 vidas para toda la prueba.'] }
+  };
+  S.FINAL_REQ = 5; // niveles de Aventura necesarios para abrir el Desafío final
+
+  let G = null, tick = null, autoNext = null;
+  S.game = { get G() { return G; } };
+
+  /* ---------- normalización de respuestas escritas ---------- */
+  function norm(s) {
+    s = String(s).toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '').trim();
+    s = s.replace(/[$\s]/g, '').replace(/(\d)\.(?=\d{3}(\D|$))/g, '$1').replace(/,/g, '.').replace(/[.!?;:]+$/, '');
+    return s;
+  }
+  S.normAnswer = norm;
+
+  S.game.start = function (cfg) {
+    const p = S.store.cur(); if (!p) return false;
+    const qs = S.buildQuestions(p, cfg);
+    if (!qs.length) { S.toast('No hay preguntas con esos filtros. Prueba con otra dificultad.'); return false; }
+    clearInterval(tick); clearTimeout(autoNext);
+    if (cfg.mode === 'adventure') { p.lastWorld = cfg.field; S.store.save(); }
+    const M = S.MODES[cfg.mode];
+    G = { cfg, M, qs, i: 0, lives: M.lives, score: 0, streak: 0, maxStreak: 0, correct: 0, wrong: 0, coins: 0, log: [], time: M.time || 0,
+      t0: Date.now(), paused: false, locked: false, over: false, xpBefore: p.xp, wrongSubj: {}, seenIds: [] };
+    S.nav.go('game', {}, { replace: true });
+    return true;
+  };
+  S.game.leave = function () { clearInterval(tick); clearTimeout(autoNext); G = null; };
+
+  /* ---------- pintado ---------- */
+  S.game.render = function () {
+    if (!G) { S.nav.go('menu', {}, { replace: true }); return ''; }
+    const html = `<section class="game" id="game">
+      <header class="hud" id="hud"></header>
+      <div class="prog" id="gprog" role="progressbar" aria-label="Progreso de la partida"><i></i></div>
+      <main class="qwrap" id="qcard"></main>
+      <div id="fb" aria-live="polite"></div>
+    </section>`;
+    setTimeout(() => {
+      hud(); renderQ();
+      if (G.M.time) { clearInterval(tick); tick = setInterval(onTick, 100); }
+    }, 0);
+    return html;
+  };
+
+  function onTick() {
+    if (!G || G.paused || G.over) return;
+    G.time -= 0.1; if (G.time <= 0) { G.time = 0; hud(); finish('time'); return; }
+    const t = $('#htime'); if (t) { t.textContent = Math.ceil(G.time) + ' s'; t.classList.toggle('low', G.time <= 10); }
+  }
+
+  function hud() {
+    const el = $('#hud'); if (!el || !G) return;
+    const q = G.q || G.qs[G.i], f = field(q.f);
+    let hearts = '';
+    if (G.M.lives) for (let i = 0; i < G.M.lives; i++) hearts += `<span class="heart ${i < G.lives ? 'on' : ''}">${icon('heart')}</span>`;
+    el.innerHTML = `<button class="icon-btn" data-act="pause" aria-label="Pausar">${icon('pause')}</button>
+      <div class="hud-field" style="--fc:${f.color}">${icon(f.id)}<span>${esc(G.cfg.mode === 'practice' || G.cfg.mode === 'adventure' ? f.name : f.name)}</span></div>
+      <div class="hud-stats">
+        ${hearts ? `<div class="hearts" aria-label="Vidas: ${G.lives}">${hearts}</div>` : ''}
+        ${G.M.time ? `<div class="chip time" id="htime">${Math.ceil(G.time)} s</div>` : ''}
+        <div class="chip" title="Puntos">${icon('star')}<b id="hscore">${G.score}</b></div>
+        <div class="chip streak ${G.streak >= 3 ? 'hot' : ''}" title="Racha">${icon('flame')}<b>${G.streak}</b></div>
+      </div>`;
+    const pr = $('#gprog i');
+    if (pr) pr.style.width = (G.M.time ? Math.min(100, (G.M.time - G.time) / G.M.time * 100) : (G.i / G.qs.length) * 100) + '%';
+  }
+
+  function roundLabel() {
+    if (G.cfg.mode !== 'final') return '';
+    const r = G.qs.rounds; let acc = 0;
+    for (let k = 0; k < r.length; k++) { acc += r[k]; if (G.i < acc) return `Ronda ${k + 1} de 3`; }
+    return '';
+  }
+  const TYPE_NAME = { mc: 'Selección múltiple', tf: 'Verdadero o falso', fill: 'Completa la respuesta', match: 'Relaciona', order: 'Ordena' };
+
+  function renderQ() {
+    if (!G) return;
+    const q = G.q = G.qs[G.i], f = field(q.f), d = S.DIFFS[q.d - 1];
+    G.locked = false; G.state = {};
+    $('#fb').innerHTML = '';
+    let body = '';
+    if (q.t === 'mc') {
+      G.state.opts = shuffle(q.o.map((t, i) => ({ t, i })));
+      body = `<div class="opts">${G.state.opts.map((o, k) => `<button class="opt" data-act="pick" data-k="${k}"><kbd>${k + 1}</kbd><span>${esc(o.t)}</span></button>`).join('')}</div>`;
+    } else if (q.t === 'tf') {
+      body = `<div class="opts tf"><button class="opt" data-act="tf" data-v="1"><kbd>V</kbd><span>Verdadero</span></button><button class="opt" data-act="tf" data-v="0"><kbd>F</kbd><span>Falso</span></button></div>`;
+    } else if (q.t === 'fill') {
+      body = `<form class="fillf" id="fillf" autocomplete="off"><label class="sr" for="ans">Tu respuesta</label><input id="ans" type="text" placeholder="Escribe tu respuesta" autocapitalize="off" spellcheck="false" enterkeyhint="done"><button class="btn primary" type="submit">Comprobar</button></form>`;
+    } else if (q.t === 'match') {
+      G.state.map = {}; G.state.sel = null;
+      G.state.right = shuffle(q.pairs.map((p, i) => i));
+      body = '<div id="matchbox"></div>';
+    } else if (q.t === 'order') {
+      let ord = q.items.map((_, i) => i); let tries = 0;
+      do { ord = shuffle(ord); tries++; } while (ord.every((v, i) => v === i) && tries < 10);
+      G.state.ord = ord;
+      body = '<div id="orderbox"></div>';
+    }
+    const rl = roundLabel();
+    $('#qcard').innerHTML = `<article class="qcard" style="--fc:${f.color}">
+      <div class="qmeta"><span class="tag">${esc(q.s)}</span><span class="tag diff d${q.d}">${d.name} · ${d.points} pts</span><span class="tag ghost">${TYPE_NAME[q.t]}</span>${rl ? `<span class="tag round">${rl}</span>` : ''}</div>
+      <h2 class="qtext">${esc(q.q)}</h2>
+      ${body}
+    </article>`;
+    if (q.t === 'match') drawMatch();
+    if (q.t === 'order') drawOrder();
+    if (q.t === 'fill') { const fm = $('#fillf'); fm.addEventListener('submit', e => { e.preventDefault(); checkFill(); }); setTimeout(() => { const a = $('#ans'); if (a && !G.paused) a.focus({ preventScroll: true }); }, 50); }
+    hud();
+  }
+
+  function drawMatch() {
+    const q = G.q, st = G.state, box = $('#matchbox'); if (!box) return;
+    const done = Object.keys(st.map).length === q.pairs.length;
+    const rightOwner = {}; Object.keys(st.map).forEach(l => { rightOwner[st.map[l]] = +l; });
+    box.innerHTML = `<p class="hint">Toca un elemento de la izquierda y luego su pareja de la derecha. Toca de nuevo para deshacer.</p>
+      <div class="match">
+        <div class="col">${q.pairs.map((p, i) => `<button class="mi ${st.sel === i ? 'sel' : ''} ${i in st.map ? 'paired c' + (i % 5) : ''}" data-act="mleft" data-i="${i}">${esc(p[0])}</button>`).join('')}</div>
+        <div class="col">${st.right.map(j => `<button class="mi ${j in rightOwner ? 'paired c' + (rightOwner[j] % 5) : ''}" data-act="mright" data-j="${j}">${esc(q.pairs[j][1])}</button>`).join('')}</div>
+      </div>
+      <button class="btn primary wide" data-act="checkmatch" ${done ? '' : 'disabled'}>Comprobar</button>`;
+  }
+  function drawOrder() {
+    const q = G.q, st = G.state, box = $('#orderbox'); if (!box) return;
+    box.innerHTML = `<p class="hint">Usa las flechas para colocar los elementos en el orden correcto.</p>
+      <ol class="order">${st.ord.map((idx, pos) => `<li><span class="pos">${pos + 1}</span><span class="otxt">${esc(q.items[idx])}</span>
+        <button class="icon-btn sm" data-act="omove" data-pos="${pos}" data-dir="-1" aria-label="Subir" ${pos === 0 ? 'disabled' : ''}>${icon('up')}</button>
+        <button class="icon-btn sm" data-act="omove" data-pos="${pos}" data-dir="1" aria-label="Bajar" ${pos === st.ord.length - 1 ? 'disabled' : ''}>${icon('down')}</button></li>`).join('')}</ol>
+      <button class="btn primary wide" data-act="checkorder">Comprobar</button>`;
+  }
+
+  /* ---------- acciones del jugador ---------- */
+  const A = S.game.actions = {
+    pick(el) {
+      if (!G || G.locked || G.paused) return;
+      const k = +el.dataset.k, o = G.state.opts[k], ok = o.i === G.q.a;
+      $$('.opt').forEach((b, i) => { const oo = G.state.opts[i]; b.disabled = true; if (oo.i === G.q.a) b.classList.add('right'); });
+      if (!ok) el.classList.add('wrong');
+      resolve(ok);
+    },
+    tf(el) {
+      if (!G || G.locked || G.paused) return;
+      const v = el.dataset.v === '1', ok = v === G.q.a;
+      $$('.opt').forEach(b => { b.disabled = true; if ((b.dataset.v === '1') === G.q.a) b.classList.add('right'); });
+      if (!ok) el.classList.add('wrong');
+      resolve(ok);
+    },
+    mleft(el) {
+      if (G.locked) return; const i = +el.dataset.i, st = G.state;
+      if (i in st.map) { delete st.map[i]; st.sel = null; } else st.sel = st.sel === i ? null : i;
+      S.audio.play('click'); drawMatch();
+    },
+    mright(el) {
+      if (G.locked) return; const j = +el.dataset.j, st = G.state;
+      const owner = Object.keys(st.map).find(l => st.map[l] === j);
+      if (owner !== undefined) { delete st.map[owner]; S.audio.play('click'); drawMatch(); return; }
+      if (st.sel === null) { S.toast('Primero toca un elemento de la izquierda.'); return; }
+      st.map[st.sel] = j; st.sel = null; S.audio.play('click'); drawMatch();
+    },
+    checkmatch() {
+      if (G.locked) return; const q = G.q, st = G.state;
+      if (Object.keys(st.map).length < q.pairs.length) return;
+      const ok = q.pairs.every((_, i) => st.map[i] === i);
+      $$('#matchbox .mi').forEach(b => { b.disabled = true; });
+      resolve(ok);
+    },
+    omove(el) {
+      if (G.locked) return; const pos = +el.dataset.pos, dir = +el.dataset.dir, o = G.state.ord, t = pos + dir;
+      if (t < 0 || t >= o.length) return;
+      [o[pos], o[t]] = [o[t], o[pos]]; S.audio.play('click'); drawOrder();
+      const nb = $$('#orderbox .order li')[t]; if (nb) { const b = $$('button', nb).find(x => x.dataset.dir === el.dataset.dir && !x.disabled); if (b) b.focus(); }
+    },
+    checkorder() {
+      if (G.locked) return; const ok = G.state.ord.every((v, i) => v === i);
+      $$('#orderbox button').forEach(b => { b.disabled = true; });
+      resolve(ok);
+    },
+    next() { next(); },
+    pause() { pause(); },
+    resume() { resume(); },
+    quit(el) {
+      if (el.dataset.sure !== '1') { el.dataset.sure = '1'; el.textContent = 'Sí, salir sin recompensa'; el.classList.add('danger'); return; }
+      abandon();
+    }
+  };
+
+  function checkFill() {
+    if (!G || G.locked || G.paused) return;
+    const inp = $('#ans'); if (!inp || !inp.value.trim()) { S.toast('Escribe una respuesta primero.'); return; }
+    const v = norm(inp.value), ok = G.q.a.some(a => norm(a) === v);
+    inp.disabled = true; $('#fillf button').disabled = true; inp.classList.add(ok ? 'right' : 'wrong');
+    resolve(ok);
+  }
+
+  function correctText(q) {
+    if (q.t === 'mc') return q.o[q.a];
+    if (q.t === 'tf') return q.a ? 'Verdadero' : 'Falso';
+    if (q.t === 'fill') return q.a[0];
+    if (q.t === 'match') return q.pairs.map(p => p[0] + ' → ' + p[1]).join(' · ');
+    return q.items.join(' → ');
+  }
+
+  function resolve(ok) {
+    if (G.locked) return; G.locked = true;
+    const p = S.store.cur(), q = G.q, f = q.f, d = S.DIFFS[q.d - 1], practice = G.cfg.mode === 'practice';
+    const st = p.stats, sf = st.fields[f] = st.fields[f] || { a: 0, c: 0 }, sk = f + '|' + q.s, ss = st.subjects[sk] = st.subjects[sk] || { a: 0, c: 0 };
+    st.answered++; sf.a++; ss.a++; G.seenIds.push(q.id);
+    let gain = 0, bonus = 0, coinGain = 0;
+    if (ok) {
+      G.streak++; G.maxStreak = Math.max(G.maxStreak, G.streak);
+      bonus = G.streak >= 3 ? 5 * Math.min(Math.floor(G.streak / 3), 4) : 0;
+      gain = Math.round((q.pts + bonus) * (practice ? 0.5 : 1));
+      G.score += gain; G.correct++; st.correct++; sf.c++; ss.c++;
+      if (!practice) { coinGain = d.coins + (G.streak % 5 === 0 ? 5 : 0); G.coins += coinGain; }
+      st.bestStreak = Math.max(st.bestStreak, G.streak);
+      S.missionEvent(p, 'correct', 1); S.missionEvent(p, 'field:' + f, 1); S.missionEvent(p, 'points', gain); S.missionEvent(p, 'streak', G.streak);
+      S.audio.play('ok');
+    } else {
+      G.streak = 0; G.wrong++; G.wrongSubj[q.f + '|' + q.s] = (G.wrongSubj[q.f + '|' + q.s] || 0) + 1;
+      if (G.M.lives) G.lives--;
+      if (G.M.time) G.time = Math.max(0, G.time - G.M.penalty);
+      S.audio.play('bad');
+      const c = $('.qcard'); if (c && !S.reduced()) { c.classList.add('shake'); }
+    }
+    G.log.push({ id: q.id, ok });
+    S.rememberQuestions(p, [q.id]); S.store.save();
+
+    const last = G.i + 1 >= G.qs.length, dead = G.M.lives && G.lives <= 0, timeUp = G.M.time && G.time <= 0;
+    const endNow = last || dead || timeUp;
+    const label = endNow ? 'Ver resultados' : 'Siguiente';
+    $('#fb').innerHTML = `<div class="feedback ${ok ? 'ok' : 'bad'}" role="status">
+      <div class="fb-head">${icon(ok ? 'check' : 'x')}<b>${ok ? ['¡Correcto!', '¡Excelente!', '¡Muy bien!', '¡Así se hace!'][G.i % 4] : 'No es esa'}</b>
+        ${ok ? `<span class="gain">+${gain} pts${coinGain ? ` · +${coinGain} monedas` : ''}</span>` : `<span class="gain">${G.M.time ? '−' + G.M.penalty + ' s' : (G.M.lives ? 'Pierdes una vida' : 'Sin penalización')}</span>`}</div>
+      ${ok ? '' : `<p class="fb-ans">Respuesta correcta: <b>${esc(correctText(q))}</b></p>`}
+      <p class="fb-exp">${esc(q.e)}</p>
+      ${G.M.time ? '' : `<button class="btn primary" data-act="next" id="nextbtn">${label}</button>`}
+    </div>`;
+    if (ok && G.streak >= 3 && G.streak % 3 === 0 && !S.reduced()) S.confetti(25, innerWidth / 2, innerHeight * 0.6);
+    hud();
+    const nb = $('#nextbtn'); if (nb) setTimeout(() => nb.focus({ preventScroll: false }), 30);
+    if (G.M.time) { clearTimeout(autoNext); autoNext = setTimeout(() => { if (G && !G.paused && !G.over) next(); }, ok ? 900 : 1700); }
+  }
+
+  function next() {
+    if (!G || G.over) return; clearTimeout(autoNext);
+    const dead = G.M.lives && G.lives <= 0;
+    if (dead) return finish('lives');
+    if (G.M.time && G.time <= 0) return finish('time');
+    if (G.i + 1 >= G.qs.length) return finish('done');
+    G.i++; renderQ(); window.scrollTo(0, 0);
+  }
+
+  /* ---------- pausa ---------- */
+  function pause() {
+    if (!G || G.over || G.paused) return; G.paused = true;
+    const ov = document.createElement('div'); ov.className = 'overlay'; ov.id = 'pauseov';
+    ov.innerHTML = `<div class="modal" role="dialog" aria-modal="true" aria-label="Partida en pausa"><h2>Partida en pausa</h2><p>Tu progreso de esta partida se mantiene. El tiempo está detenido.</p>
+      <div class="stack"><button class="btn primary" data-act="resume" id="resbtn">Continuar</button><button class="btn ghost" data-act="quit">Salir de la partida</button></div></div>`;
+    document.body.appendChild(ov); $('#resbtn').focus();
+  }
+  function resume() { const ov = $('#pauseov'); if (ov) ov.remove(); if (G) G.paused = false; }
+  S.game.pauseIfActive = function () { if (G && !G.over && !G.paused && $('#game')) pause(); };
+  S.game.key = function (e) {
+    if (!G || G.over || !$('#game')) return;
+    if (e.key === 'Escape') { G.paused ? resume() : pause(); return; }
+    if (G.paused) return;
+    const tag = (e.target.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea') return;
+    const q = G.q;
+    if (G.locked) { if (e.key === 'Enter' && !G.M.time) { /* el botón con foco ya lo gestiona */ } return; }
+    if (q.t === 'mc' && /^[1-4]$/.test(e.key)) { const b = $$('.opt')[+e.key - 1]; if (b) b.click(); }
+    if (q.t === 'tf' && /^[vVfF]$/.test(e.key)) { const b = $$('.opt')[/[vV]/.test(e.key) ? 0 : 1]; if (b) b.click(); }
+  };
+
+  /* ---------- final de partida ---------- */
+  function abandon() {
+    const r = $('#pauseov'); if (r) r.remove();
+    clearInterval(tick); clearTimeout(autoNext);
+    const p = S.store.cur(); S.store.save(); G = null;
+    S.toast('Saliste de la partida. Tus respuestas quedaron registradas en tus estadísticas.');
+    S.nav.go('menu', {}, { replace: true, reset: true });
+  }
+
+  function finish(reason) {
+    if (!G || G.over) return; G.over = true; clearInterval(tick); clearTimeout(autoNext);
+    const p = S.store.cur(), c = G.cfg, M = G.M, st = p.stats, total = G.correct + G.wrong;
+    let win;
+    if (c.mode === 'timed') win = G.correct >= M.goal;
+    else if (c.mode === 'practice') win = true;
+    else win = reason === 'done' && G.lives > 0;
+    let stars = 0, bonusCoins = 0, bonusXp = 0;
+    if (c.mode === 'adventure' && win) {
+      stars = G.wrong === 0 ? 3 : G.wrong === 1 ? 2 : 1; bonusCoins = 10 + 5 * stars;
+      const key = c.field + '-' + c.level; p.adv[key] = Math.max(p.adv[key] || 0, stars);
+    } else if (c.mode === 'quick' && win) bonusCoins = 8;
+    else if (c.mode === 'mixed' && win) bonusCoins = 15;
+    else if (c.mode === 'timed' && win) bonusCoins = 8;
+    else if (c.mode === 'final' && win) { bonusCoins = 60; bonusXp = 100; st.finalWins++; }
+    S.addCoins(p, G.coins + bonusCoins); p.xp += G.score + bonusXp;
+    const perfect = G.wrong === 0 && total >= 5 && c.mode !== 'timed' && reason === 'done';
+    st.games++; if (perfect) st.perfect++;
+    S.missionEvent(p, 'games', 1); if (perfect) S.missionEvent(p, 'perfect', 1); if (c.mode === 'timed') { S.missionEvent(p, 'timed', 1); st.timedBest = Math.max(st.timedBest, G.correct); }
+    const prevBest = p.best[c.mode] || 0, record = G.score > prevBest; if (record) p.best[c.mode] = G.score;
+    const lvlBefore = S.levelOf(G.xpBefore), lvlAfter = S.levelOf(p.xp);
+    const fresh = S.checkAchievements(p);
+    S.store.save();
+    const weak = Object.entries(G.wrongSubj).sort((a, b) => b[1] - a[1]).slice(0, 3).map(([k, n]) => { const [f, s] = k.split('|'); return { f, s, n }; });
+    const res = { cfg: c, mode: c.mode, win, reason, score: G.score, xp: G.score + bonusXp, coins: G.coins + bonusCoins, correct: G.correct, wrong: G.wrong, total,
+      maxStreak: G.maxStreak, stars, secs: Math.round((Date.now() - G.t0) / 1000), lvlBefore, lvlAfter, fresh, weak, record, prevBest,
+      log: G.log.map(l => ({ q: S.qById[l.id], ok: l.ok })), perfect, bonusCoins, bonusXp };
+    G = null;
+    S.audio.play(win ? 'done' : 'lose'); if (lvlAfter > lvlBefore) setTimeout(() => S.audio.play('level'), 900);
+    S.nav.go('results', res, { replace: true, reset: true });
+  }
+})(window.S);
+
+/* Saberium — navegación y pantallas */
+(function (S) {
+  'use strict';
+  const { $, $$, esc, field, icon, fmt } = S;
+  const LV = ['Fácil', 'Intermedio', 'Avanzado'];
+  let current = null, stack = [];
+  const app = () => $('#app');
+
+  /* ---------- componentes ---------- */
+  const avatar = (p, big) => `<span class="avatar ${big ? 'big' : ''} frame-${p.equipped.frame}">${icon(p.equipped.avatar)}</span>`;
+  const stars = (n, max) => Array.from({ length: max || 3 }, (_, i) => `<span class="st ${i < n ? 'on' : ''}">${icon('star')}</span>`).join('');
+  const bar = (pct, color) => `<div class="bar"><i style="width:${Math.max(0, Math.min(100, pct))}%;${color ? '--bc:' + color : ''}"></i></div>`;
+  const head = (title, sub, noBack) => `<div class="shead">${noBack ? '' : `<button class="icon-btn" data-act="back" aria-label="Volver">${icon('back')}</button>`}<div><h1>${title}</h1>${sub ? `<p>${sub}</p>` : ''}</div></div>`;
+  const titleName = p => (S.ITEMS.title.find(t => t.id === p.equipped.title) || {}).name || '';
+  const advStars = (p, f, l) => p.adv[f + '-' + l] || 0;
+  const worldDone = (p, f) => [0, 1, 2].every(l => advStars(p, f, l) > 0);
+  const worldOpen = () => true; // los cinco mundos están abiertos desde el inicio
+  const levelOpen = (p, i, l) => worldOpen(p, i) && (l === 0 || advStars(p, S.FIELDS[i].id, l - 1) > 0);
+  const advDone = p => S.FIELDS.reduce((n, f) => n + [0, 1, 2].filter(l => advStars(p, f.id, l) > 0).length, 0);
+  function nextAdventure(p) {
+    const lw = p.lastWorld && S.FIELDS.findIndex(f => f.id === p.lastWorld);
+    if (lw >= 0) for (let l = 0; l < 3; l++) if (advStars(p, p.lastWorld, l) === 0 && levelOpen(p, lw, l)) return { field: p.lastWorld, level: l };
+    for (let i = 0; i < S.FIELDS.length; i++) for (let l = 0; l < 3; l++) if (advStars(p, S.FIELDS[i].id, l) === 0 && levelOpen(p, i, l)) return { field: S.FIELDS[i].id, level: l };
+    return null;
+  }
+  const unclaimed = p => S.ensureMissions(p).list.filter(m => !m.claimed && m.progress >= S.missionDef(m.id).goal).length;
+
+  /* ---------- navegación ---------- */
+  S.nav = {
+    go(name, params, opts) {
+      opts = opts || {};
+      if (opts.reset) stack = [];
+      else if (!opts.replace && current && current.name !== 'game' && current.name !== 'results') stack.push(current);
+      current = { name, params: params || {} };
+      render();
+    },
+    back() {
+      const prev = stack.pop();
+      if (prev) { current = prev; render(); } else S.nav.go(S.store.cur() ? 'menu' : 'home', {}, { reset: true });
+    },
+    get cur() { return current; }
+  };
+
+  function topbar() {
+    const p = S.store.cur(), el = $('#top');
+    const show = p && !['home', 'profiles', 'game'].includes(current.name);
+    el.hidden = !show; if (!show) return;
+    const li = S.levelInfo(p.xp);
+    el.innerHTML = `<button class="brand sm" data-act="go" data-to="menu" aria-label="Ir al menú principal">${S.logoMark()}<span>SABERIUM</span></button>
+      <div class="me" title="Nivel ${li.level}">${avatar(p)}<div class="me-info"><b>${esc(p.name)}</b><span>Nivel ${li.level}</span>${bar(li.pct, 'var(--gold)')}</div></div>
+      <div class="chip coins" title="Monedas">${icon('coin')}<b>${fmt(p.coins)}</b></div>`;
+  }
+
+  function render() {
+    const name = current.name, fn = SCREENS[name];
+    if (name !== 'game') S.game.leave();
+    const p = S.store.cur();
+    if (!['home', 'profiles'].includes(name) && !p) { current = { name: 'home', params: {} }; return render(); }
+    if (p) { S.ensureMissions(p); }
+    S.applyPrefs(); topbar();
+    app().innerHTML = fn(current.params || {}, p);
+    app().className = 'screen s-' + name;
+    window.scrollTo(0, 0);
+    const h = $('h1', app()); if (h && name !== 'game') { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
+    if (SCREENS[name + '_mount']) SCREENS[name + '_mount'](current.params, p);
+  }
+  S.nav.render = render;
+
+  const SCREENS = {};
+
+  /* ---------- inicio ---------- */
+  SCREENS.home = () => {
+    const p = S.store.cur();
+    return `<section class="hero">
+      <div class="hero-main">
+        <div class="brand big">${S.logoMark()}<h1 class="wordmark">SABERIUM</h1></div>
+        <p class="tagline">Cinco mundos, un cristal y miles de formas de demostrar lo que sabes.</p>
+        <div class="hero-actions">
+          ${p ? `<button class="btn primary lg" data-act="go" data-to="menu">Continuar como ${esc(p.name)}</button><button class="btn ghost lg" data-act="go" data-to="profiles">Cambiar jugador</button>`
+            : `<button class="btn primary lg" data-act="go" data-to="profiles">Jugar</button>`}
+          <button class="btn ghost lg" data-act="go" data-to="settings" ${p ? '' : 'data-needplayer="1"'}>Ajustes</button>
+        </div>
+      </div>
+      <ul class="worlds-strip" aria-label="Los cinco campos">
+        ${S.FIELDS.map(f => `<li style="--fc:${f.color}">${icon(f.id)}<b>${f.name}</b><span>${f.world}</span></li>`).join('')}
+      </ul>
+    </section>`;
+  };
+
+  /* ---------- perfiles ---------- */
+  SCREENS.profiles = (params) => {
+    const ps = S.store.players();
+    const free = S.ITEMS.avatar.filter(a => a.price === 0);
+    return `<section class="narrow">${head('¿Quién juega?', 'Elige tu perfil o crea uno nuevo. Tu progreso se guarda en este dispositivo.')}
+      ${ps.length ? `<div class="plist">${ps.map(p => `<div class="pcard">
+          <button class="pick" data-act="selectp" data-id="${p.id}">${avatar(p, true)}<span class="pn"><b>${esc(p.name)}</b><small>Nivel ${S.levelOf(p.xp)} · ${fmt(p.xp)} XP</small></span></button>
+          <button class="icon-btn sm" data-act="delp" data-id="${p.id}" aria-label="Eliminar perfil de ${esc(p.name)}">${icon('x')}</button></div>`).join('')}</div>`
+        : `<p class="empty">Aún no hay perfiles. Crea el primero para empezar a jugar.</p>`}
+      ${params.del ? `<div class="notice"><p>¿Eliminar el perfil de <b>${esc(S.store.players().find(x => x.id === params.del)?.name || '')}</b>? No se puede deshacer.</p><div class="row"><button class="btn danger" data-act="delp2" data-id="${params.del}">Sí, eliminar</button><button class="btn ghost" data-act="delp0">Cancelar</button></div></div>` : ''}
+      <form class="card form" data-form="newp"><h2>Nuevo perfil</h2>
+        <label for="pname">Nombre del jugador</label>
+        <input id="pname" name="name" type="text" maxlength="16" required minlength="2" placeholder="Por ejemplo: Camila" autocomplete="off">
+        <fieldset><legend>Avatar inicial</legend><div class="avchoice">
+          ${free.map((a, i) => `<label class="avopt"><input type="radio" name="av" value="${a.id}" ${i === 0 ? 'checked' : ''}><span>${icon(a.id)}<small>${a.name}</small></span></label>`).join('')}
+        </div></fieldset>
+        <p class="err" id="perr" role="alert" hidden></p>
+        <button class="btn primary" type="submit">Crear y jugar</button>
+      </form></section>`;
+  };
+
+  /* ---------- menú ---------- */
+  SCREENS.menu = (_, p) => {
+    const li = S.levelInfo(p.xp), na = nextAdventure(p), un = unclaimed(p);
+    const tiles = [
+      ['modes', 'play', 'Jugar', 'Elige un modo de juego'], ['worlds', 'map', 'Aventura', `${advDone(p)} de 15 niveles`],
+      ['missions', 'gift', 'Misiones', un ? `${un} para reclamar` : 'Retos de hoy'], ['shop', 'cart', 'Tienda', 'Estilo con monedas'],
+      ['progress', 'chart', 'Progreso', 'Cómo vas por materia'], ['profile', 'user', 'Perfil y logros', `${Object.keys(p.ach).length} de ${S.ACHIEVEMENTS.length} logros`],
+      ['settings', 'gear', 'Ajustes', 'Sonido y accesibilidad'], ['profiles', 'swap', 'Cambiar jugador', 'Otro perfil']
+    ];
+    return `<section>
+      <div class="welcome card"><div class="w-left">${avatar(p, true)}<div><p class="eyebrow">${esc(titleName(p))}</p><h1>Hola, ${esc(p.name)}</h1></div></div>
+        <div class="w-xp"><div class="row sb"><b>Nivel ${li.level}</b><span>${fmt(li.into)} / ${fmt(li.need)} XP</span></div>${bar(li.pct, 'var(--gold)')}</div></div>
+      ${na ? `<button class="cta" data-act="brief" data-mode="adventure" data-field="${na.field}" data-level="${na.level}" style="--fc:${field(na.field).color}">${icon(na.field)}<span><small>Continuar aventura</small><b>${field(na.field).world} · ${LV[na.level]}</b></span>${icon('play')}</button>
+        <button class="btn ghost" data-act="go" data-to="worlds">${icon('map')} Elegir otro mundo: Ciencias, Sociales, Humanidades o Artes</button>` :
+        `<button class="cta" data-act="go" data-to="modes"><span><small>Aventura completada</small><b>Prueba el Desafío final</b></span>${icon('trophy')}</button>`}
+      <div class="tiles">${tiles.map(t => `<button class="tile" data-act="go" data-to="${t[0]}">${icon(t[1])}<b>${t[2]}</b><small>${t[3]}</small>${t[0] === 'missions' && un ? `<i class="dot" aria-label="${un} por reclamar">${un}</i>` : ''}</button>`).join('')}</div>
+    </section>`;
+  };
+
+  /* ---------- modos ---------- */
+  SCREENS.modes = (_, p) => {
+    const done = advDone(p), locked = done < S.FINAL_REQ;
+    return `<section>${head('Modos de juego', 'Cada modo tiene sus propias reglas y su condición de victoria.')}
+      <div class="mgrid">${Object.entries(S.MODES).map(([id, m]) => {
+        const lock = id === 'final' && locked, best = p.best[id];
+        return `<article class="mcard ${lock ? 'locked' : ''}" style="--fc:${m.color}"><div class="mc-ic">${icon(lock ? 'lock' : m.icon)}</div>
+          <h2>${m.name}</h2><p>${m.short}</p>
+          <p class="mc-meta">${lock ? `Completa ${S.FINAL_REQ} niveles de Aventura (${done}/${S.FINAL_REQ})` : (best ? `Récord: ${fmt(best)} pts` : 'Aún sin récord')}</p>
+          <button class="btn ${lock ? 'ghost' : 'primary'}" data-act="mode" data-mode="${id}">${lock ? 'Bloqueado' : id === 'adventure' ? 'Ver mundos' : id === 'practice' ? 'Elegir materia' : 'Ver reglas'}</button></article>`;
+      }).join('')}</div></section>`;
+  };
+
+  /* ---------- aventura: mundos ---------- */
+  SCREENS.worlds = (_, p) => `<section>${head('Aventura', 'Elige cualquier mundo. Dentro de cada uno, supera un nivel para abrir el siguiente.')}
+    <div class="wlist">${S.FIELDS.map((f, i) => {
+      const open = worldOpen(p, i), n = [0, 1, 2].filter(l => advStars(p, f.id, l) > 0).length;
+      return `<article class="world ${open ? '' : 'locked'}" style="--fc:${f.color}">
+        <div class="w-head">${icon(open ? f.id : 'lock')}<div><h2>${f.world}</h2><p>${f.name} · ${n}/3 niveles</p></div></div>
+        ${open ? '' : `<p class="w-lock">Completa ${S.FIELDS[i - 1].world} para abrir este mundo.</p>`}
+        <div class="levels">${[0, 1, 2].map(l => {
+          const ok = levelOpen(p, i, l);
+          return `<button class="lvl" ${ok ? `data-act="brief" data-mode="adventure" data-field="${f.id}" data-level="${l}"` : 'disabled aria-disabled="true"'}>
+            <span class="lv-n">${ok ? l + 1 : icon('lock')}</span><b>${LV[l]}</b><span class="stars">${stars(advStars(p, f.id, l))}</span></button>`;
+        }).join('')}</div></article>`;
+    }).join('')}</div></section>`;
+
+  /* ---------- práctica: campos y materias ---------- */
+  SCREENS.fields = (_, p) => `<section>${head('Elige un campo', 'Practica la materia que quieras, sin presión.')}
+    <div class="fgrid">${S.FIELDS.map(f => {
+      const s = p.stats.fields[f.id], acc = s && s.a ? Math.round(s.c / s.a * 100) : null;
+      return `<button class="fcard" style="--fc:${f.color}" data-act="pfield" data-field="${f.id}">${icon(f.id)}<h2>${f.name}</h2><p>${f.blurb}</p>
+        <span class="f-meta">${S.QUESTIONS.filter(q => q.f === f.id).length} retos · ${acc === null ? 'sin practicar' : acc + ' % de acierto'}</span></button>`;
+    }).join('')}</div></section>`;
+
+  SCREENS.practice = (params) => {
+    const f = field(params.field), subj = params.subject || '', diff = params.diff || 0;
+    const avail = S.QUESTIONS.filter(q => q.f === f.id && (!subj || q.s === subj) && (!diff || q.d === diff)).length;
+    return `<section class="narrow" style="--fc:${f.color}">${head('Modo práctica', f.name)}
+      <div class="card">
+        <h2 class="h3">Materia</h2>
+        <div class="chips">${['', ...f.subjects].map(s => `<button class="chipbtn ${s === subj ? 'on' : ''}" data-act="psetup" data-subject="${esc(s)}" data-diff="${diff}" data-field="${f.id}" aria-pressed="${s === subj}">${s || 'Todas'}</button>`).join('')}</div>
+        <h2 class="h3">Dificultad</h2>
+        <div class="chips">${[[0, 'Todas'], [1, 'Fácil'], [2, 'Intermedio'], [3, 'Avanzado']].map(([d, n]) => `<button class="chipbtn ${d === diff ? 'on' : ''}" data-act="psetup" data-subject="${esc(subj)}" data-diff="${d}" data-field="${f.id}" aria-pressed="${d === diff}">${n}</button>`).join('')}</div>
+        <p class="note">${avail ? `${avail} retos disponibles con este filtro. Jugarás hasta 10.` : 'No hay retos con esta combinación. Cambia la materia o la dificultad.'}</p>
+        <button class="btn primary lg" data-act="startgame" data-mode="practice" data-field="${f.id}" data-subject="${esc(subj)}" data-diff="${diff}" ${avail ? '' : 'disabled'}>Empezar práctica</button>
+      </div></section>`;
+  };
+
+  /* ---------- reglas antes de jugar ---------- */
+  SCREENS.briefing = (params) => {
+    const m = S.MODES[params.mode], diff = params.diff || 0, adv = params.mode === 'adventure';
+    const f = adv ? field(params.field) : null;
+    const choose = ['quick', 'timed', 'mixed'].includes(params.mode);
+    return `<section class="narrow" style="--fc:${f ? f.color : m.color}">
+      ${head(adv ? `${f.world} · ${LV[params.level]}` : m.name, adv ? f.name : m.short)}
+      <div class="card"><div class="brief-ic">${icon(adv ? f.id : m.icon)}</div>
+        <h2 class="h3">Reglas</h2><ul class="rules">${m.rules.map(r => `<li>${r}</li>`).join('')}</ul>
+        ${choose ? `<h2 class="h3">Dificultad</h2><div class="chips">${[[0, 'Todas'], [1, 'Fácil'], [2, 'Intermedio'], [3, 'Avanzado']].map(([d, n]) => `<button class="chipbtn ${d === diff ? 'on' : ''}" data-act="bsetup" data-mode="${params.mode}" data-diff="${d}" aria-pressed="${d === diff}">${n}</button>`).join('')}</div>` : ''}
+        <button class="btn primary lg" data-act="startgame" data-mode="${params.mode}" ${adv ? `data-field="${params.field}" data-level="${params.level}"` : ''} data-diff="${diff}">¡Comenzar!</button>
+      </div></section>`;
+  };
+
+  /* ---------- resultados ---------- */
+  SCREENS.results = (r) => {
+    const m = S.MODES[r.mode], p = S.store.cur();
+    const titles = { adventure: ['¡Nivel superado!', 'Nivel no superado'], quick: ['¡Desafío cumplido!', 'Fin del desafío'], practice: ['Práctica terminada', 'Práctica terminada'],
+      timed: ['¡Reto superado!', 'Tiempo agotado'], mixed: ['¡Reto mixto completado!', 'Reto mixto sin terminar'], final: ['¡Campeón del Cristal!', 'Desafío final no superado'] };
+    const why = r.reason === 'lives' ? 'Te quedaste sin vidas.' : r.reason === 'time' ? 'Se acabó el tiempo.' : '';
+    const acc = r.total ? Math.round(r.correct / r.total * 100) : 0;
+    const mm = Math.floor(r.secs / 60), ss = String(r.secs % 60).padStart(2, '0');
+    const next = r.mode === 'adventure' && r.win ? nextAdventure(p) : null;
+    return `<section class="results ${r.win ? 'win' : 'lose'}" style="--fc:${m.color}">
+      <div class="res-hero"><div class="res-ic">${icon(r.win ? 'trophy' : 'heart')}</div><h1>${titles[r.mode][r.win ? 0 : 1]}</h1>
+        ${r.mode === 'adventure' && r.win ? `<div class="stars big">${stars(r.stars)}</div>` : ''}
+        <p>${why} ${r.win ? 'Buen trabajo.' : 'Cada error es una pista de qué repasar. Inténtalo de nuevo.'}${r.mode === 'timed' ? ` Meta: ${m.goal} aciertos.` : ''}</p></div>
+      ${r.lvlAfter > r.lvlBefore ? `<div class="banner lvl">${icon('bolt')}<b>¡Subiste al nivel ${r.lvlAfter}!</b></div>` : ''}
+      ${r.record && r.score > 0 ? `<div class="banner rec">${icon('trophy')}<b>Nuevo récord personal: ${fmt(r.score)} pts</b>${r.prevBest ? `<span>Antes: ${fmt(r.prevBest)}</span>` : ''}</div>` : ''}
+      <div class="stat-grid">
+        <div class="stat"><small>Puntos</small><b>${fmt(r.score)}</b></div>
+        <div class="stat"><small>Experiencia</small><b>+${fmt(r.xp)}</b></div>
+        <div class="stat"><small>Monedas</small><b>+${fmt(r.coins)}</b></div>
+        <div class="stat"><small>Aciertos</small><b>${r.correct}/${r.total}</b></div>
+        <div class="stat"><small>Precisión</small><b>${acc} %</b></div>
+        <div class="stat"><small>Mejor racha</small><b>${r.maxStreak}</b></div>
+        <div class="stat"><small>Tiempo</small><b>${mm}:${ss}</b></div>
+        ${r.bonusCoins ? `<div class="stat"><small>Bono de victoria</small><b>+${r.bonusCoins}</b></div>` : ''}
+      </div>
+      ${r.fresh.length ? `<div class="card"><h2 class="h3">Logros desbloqueados</h2><ul class="achlist">${r.fresh.map(a => `<li>${icon('star')}<span><b>${esc(a.name)}</b><small>${esc(a.desc)} (+20 monedas)</small></span></li>`).join('')}</ul></div>` : ''}
+      <div class="card"><h2 class="h3">Recomendaciones</h2>
+        ${r.weak.length ? `<p class="note">Estos temas te costaron más. Un repaso corto ayuda:</p><div class="chips">${r.weak.map(w => `<button class="chipbtn" style="--fc:${field(w.f).color}" data-act="practicewith" data-field="${w.f}" data-subject="${esc(w.s)}">${esc(w.s)} (${w.n} ${w.n === 1 ? 'error' : 'errores'})</button>`).join('')}</div>`
+          : `<p class="note">${r.total ? 'No tuviste errores en esta partida. Sube la dificultad para seguir creciendo.' : 'Responde más preguntas para recibir recomendaciones.'}</p>`}</div>
+      ${r.log.length ? `<details class="card review"><summary>Revisar respuestas (${r.log.length})</summary><ol>${r.log.map(l => `<li class="${l.ok ? 'ok' : 'bad'}">${icon(l.ok ? 'check' : 'x')}<span><b>${esc(l.q.q)}</b><small>${esc(l.q.e)}</small></span></li>`).join('')}</ol></details>` : ''}
+      <div class="actions">
+        ${next ? `<button class="btn primary lg" data-act="brief" data-mode="adventure" data-field="${next.field}" data-level="${next.level}">Siguiente nivel</button>` : ''}
+        <button class="btn ${next ? 'ghost' : 'primary'} lg" data-act="again">Jugar de nuevo</button>
+        <button class="btn ghost lg" data-act="go" data-to="menu" data-reset="1">Menú principal</button>
+      </div></section>`;
+  };
+  SCREENS.results_mount = (r) => {
+    if (r.win) S.confetti(r.mode === 'final' ? 220 : 110);
+    if (r.lvlAfter > r.lvlBefore) setTimeout(() => S.confetti(90), 700);
+  };
+
+  SCREENS.game = () => S.game.render();
+
+  /* ---------- perfil ---------- */
+  SCREENS.profile = (_, p) => {
+    const li = S.levelInfo(p.xp), st = p.stats, acc = st.answered ? Math.round(st.correct / st.answered * 100) : 0;
+    return `<section>${head('Perfil')}
+      <div class="card pfhead">${avatar(p, true)}<div><p class="eyebrow">${esc(titleName(p))}</p><h2>${esc(p.name)}</h2>
+        <div class="row sb"><b>Nivel ${li.level}</b><span>${fmt(p.xp)} XP en total</span></div>${bar(li.pct, 'var(--gold)')}<small>Faltan ${fmt(li.need - li.into)} XP para el nivel ${li.level + 1}</small></div></div>
+      <div class="stat-grid">
+        <div class="stat"><small>Partidas</small><b>${st.games}</b></div><div class="stat"><small>Respuestas correctas</small><b>${st.correct}</b></div>
+        <div class="stat"><small>Precisión</small><b>${st.answered ? acc + ' %' : '—'}</b></div><div class="stat"><small>Mejor racha</small><b>${st.bestStreak}</b></div>
+        <div class="stat"><small>Monedas</small><b>${fmt(p.coins)}</b></div><div class="stat"><small>Niveles de Aventura</small><b>${advDone(p)}/15</b></div></div>
+      <div class="card"><h2 class="h3">Récords personales</h2>${Object.keys(p.best).length ? `<ul class="records">${Object.entries(S.MODES).filter(([id]) => p.best[id]).map(([id, m]) => `<li>${icon(m.icon)}<span>${m.name}</span><b>${fmt(p.best[id])} pts</b></li>`).join('')}</ul>` : '<p class="note">Todavía no tienes récords. Termina una partida para registrar el primero.</p>'}</div>
+      <div class="card"><h2 class="h3">Logros (${Object.keys(p.ach).length}/${S.ACHIEVEMENTS.length})</h2>
+        <ul class="achgrid">${S.ACHIEVEMENTS.map(a => { const got = p.ach[a.id]; return `<li class="${got ? 'got' : ''}" ${a.medal && got ? `style="--fc:${a.medal}"` : ''}>${icon(got ? 'star' : 'lock')}<span><b>${esc(a.name)}</b><small>${esc(a.desc)}</small></span></li>`; }).join('')}</ul></div></section>`;
+  };
+
+  /* ---------- misiones ---------- */
+  SCREENS.missions = (_, p) => {
+    const ms = S.ensureMissions(p), all = ms.list.every(m => m.claimed);
+    return `<section class="narrow">${head('Misiones diarias', 'Se renuevan cada día. Reclama tus recompensas al completarlas.')}
+      <div class="mlist">${ms.list.map((m, i) => {
+        const d = S.missionDef(m.id), done = m.progress >= d.goal, pr = Math.min(m.progress, d.goal);
+        return `<article class="mission ${m.claimed ? 'claimed' : ''}"><div class="m-top"><h2>${d.text}</h2><span class="reward">+${d.coins} ${icon('coin')} · +${d.xp} XP</span></div>
+          ${bar(pr / d.goal * 100, 'var(--ok)')}<div class="row sb"><small>${pr} / ${d.goal}</small>
+          <button class="btn ${done && !m.claimed ? 'primary' : 'ghost'} sm" data-act="claim" data-i="${i}" ${done && !m.claimed ? '' : 'disabled'}>${m.claimed ? 'Reclamada' : done ? 'Reclamar' : 'En curso'}</button></div></article>`;
+      }).join('')}</div>
+      <article class="mission bonus ${ms.bonus ? 'claimed' : ''}"><div class="m-top"><h2>Bono del día</h2><span class="reward">+30 ${icon('coin')} · +60 XP</span></div>
+        <p class="note">Reclama las tres misiones para abrir este premio extra.</p>
+        <button class="btn ${all && !ms.bonus ? 'primary' : 'ghost'} sm" data-act="claimbonus" ${all && !ms.bonus ? '' : 'disabled'}>${ms.bonus ? 'Reclamado' : all ? 'Reclamar bono' : 'Bloqueado'}</button></article>
+      <div class="actions"><button class="btn primary" data-act="go" data-to="modes">Ir a jugar</button></div></section>`;
+  };
+
+  /* ---------- tienda ---------- */
+  SCREENS.shop = (params, p) => {
+    const cat = params.cat || 'avatar';
+    return `<section>${head('Tienda', 'Gasta tus monedas en objetos de estilo. No cambian tu puntaje.')}
+      <div class="row sb wrap"><div class="tabs" role="tablist">${Object.entries(S.ITEM_CATS).map(([k, n]) => `<button role="tab" aria-selected="${k === cat}" class="tab ${k === cat ? 'on' : ''}" data-act="shoptab" data-cat="${k}">${n}</button>`).join('')}</div>
+        <div class="chip coins">${icon('coin')}<b>${fmt(p.coins)}</b></div></div>
+      <div class="igrid">${S.ITEMS[cat].map(it => {
+        const own = p.owned[cat].includes(it.id), eq = p.equipped[cat] === it.id, can = p.coins >= it.price;
+        let prev = '';
+        if (cat === 'avatar') prev = `<span class="avatar big frame-none">${icon(it.id)}</span>`;
+        else if (cat === 'frame') prev = `<span class="avatar big frame-${it.id}">${icon(p.equipped.avatar)}</span>`;
+        else if (cat === 'bg') prev = `<span class="bgprev" data-bg="${it.id}"></span>`;
+        else prev = `<span class="ttl">${esc(it.name)}</span>`;
+        return `<article class="item ${eq ? 'eq' : ''}">${prev}<h2>${esc(it.name)}</h2>
+          ${own ? `<button class="btn ${eq ? 'ghost' : 'primary'} sm" data-act="equip" data-cat="${cat}" data-id="${it.id}" ${eq ? 'disabled' : ''}>${eq ? 'Equipado' : 'Equipar'}</button>`
+            : `<button class="btn ${can ? 'primary' : 'ghost'} sm" data-act="buy" data-cat="${cat}" data-id="${it.id}" ${can ? '' : 'disabled'}>${icon('coin')} ${it.price}${can ? '' : ' · faltan ' + (it.price - p.coins)}</button>`}</article>`;
+      }).join('')}</div></section>`;
+  };
+
+  /* ---------- progreso académico ---------- */
+  SCREENS.progress = (_, p) => {
+    const st = p.stats;
+    if (!st.answered) return `<section class="narrow">${head('Progreso académico')}<div class="card empty-card">${icon('chart')}<h2>Aún no hay datos</h2><p>Responde algunas preguntas y aquí verás tu precisión en cada campo y materia.</p><button class="btn primary" data-act="go" data-to="modes">Jugar ahora</button></div></section>`;
+    const subs = [];
+    S.FIELDS.forEach(f => f.subjects.forEach(s => { const x = st.subjects[f.id + '|' + s] || { a: 0, c: 0 }; subs.push({ f: f.id, s, a: x.a, c: x.c, acc: x.a ? x.c / x.a : null }); }));
+    const weak = subs.filter(x => x.a >= 3 && x.acc < 0.7).sort((a, b) => a.acc - b.acc).slice(0, 3);
+    const fresh = subs.filter(x => x.a < 3).sort((a, b) => a.a - b.a).slice(0, 3);
+    const recs = weak.length ? weak : fresh;
+    return `<section>${head('Progreso académico', `${st.correct} aciertos de ${st.answered} respuestas (${Math.round(st.correct / st.answered * 100)} %)`)}
+      <div class="card"><h2 class="h3">${weak.length ? 'Te conviene repasar' : 'Para explorar'}</h2><div class="chips">${recs.map(x => `<button class="chipbtn" style="--fc:${field(x.f).color}" data-act="practicewith" data-field="${x.f}" data-subject="${esc(x.s)}">${esc(x.s)}${x.a ? ' · ' + Math.round(x.acc * 100) + ' %' : ' · sin practicar'}</button>`).join('')}</div></div>
+      <div class="pgrid">${S.FIELDS.map(f => {
+        const s = st.fields[f.id] || { a: 0, c: 0 }, pct = s.a ? Math.round(s.c / s.a * 100) : 0;
+        return `<article class="pcardf" style="--fc:${f.color}"><div class="w-head">${icon(f.id)}<div><h2>${f.name}</h2><p>${s.a ? `${s.c} de ${s.a} correctas` : 'Sin practicar'}</p></div><b class="pct">${s.a ? pct + ' %' : '—'}</b></div>
+          ${bar(pct)}<ul class="subs">${f.subjects.map(sn => { const x = st.subjects[f.id + '|' + sn] || { a: 0, c: 0 }, pp = x.a ? Math.round(x.c / x.a * 100) : 0; return `<li><span>${sn}</span><div>${bar(pp)}</div><small>${x.a ? pp + ' %' : '—'}</small></li>`; }).join('')}</ul></article>`;
+      }).join('')}</div></section>`;
+  };
+
+  /* ---------- ajustes ---------- */
+  SCREENS.settings = (params) => {
+    const s = S.store.settings();
+    const sw = (k, label, desc) => `<label class="switch"><input type="checkbox" data-set="${k}" ${s[k] ? 'checked' : ''}><span class="track"></span><span class="sl"><b>${label}</b><small>${desc}</small></span></label>`;
+    return `<section class="narrow">${head('Ajustes')}
+      <div class="card"><h2 class="h3">Sonido</h2>
+        ${sw('sfx', 'Efectos de sonido', 'Aciertos, errores, logros y subidas de nivel.')}
+        ${sw('music', 'Música de fondo', 'Una melodía suave mientras juegas.')}
+        <label class="range" for="vol"><b>Volumen</b><input id="vol" type="range" min="0" max="1" step="0.05" value="${s.vol}" data-setr="vol"></label>
+        <button class="btn ghost sm" data-act="testsound">Probar sonido</button></div>
+      <div class="card"><h2 class="h3">Accesibilidad</h2>
+        ${sw('reduce', 'Reducir animaciones', 'Desactiva confeti, sacudidas y movimientos.')}
+        ${sw('large', 'Texto grande', 'Aumenta el tamaño de la letra en todo el juego.')}
+        ${sw('contrast', 'Alto contraste', 'Bordes y textos más marcados.')}
+        <p class="note">Puedes jugar con el teclado: números 1 a 4 para elegir, V y F en verdadero o falso, Esc para pausar.</p></div>
+      <div class="card"><h2 class="h3">Datos</h2>
+        ${S.store.cur() ? (params.confirm === 'reset' ? `<div class="notice"><p>Se borrará todo el progreso de <b>${esc(S.store.cur().name)}</b>. Los demás perfiles no cambian.</p><div class="row"><button class="btn danger" data-act="reset2">Sí, reiniciar</button><button class="btn ghost" data-act="cfg0">Cancelar</button></div></div>` : `<button class="btn ghost" data-act="cfg" data-c="reset">Reiniciar mi progreso</button>`) : ''}
+        ${params.confirm === 'wipe' ? `<div class="notice"><p>Se borrarán todos los perfiles y ajustes de este dispositivo.</p><div class="row"><button class="btn danger" data-act="wipe2">Sí, borrar todo</button><button class="btn ghost" data-act="cfg0">Cancelar</button></div></div>` : `<button class="btn ghost" data-act="cfg" data-c="wipe">Borrar todos los datos</button>`}
+      </div></section>`;
+  };
+
+  /* ---------- acciones ---------- */
+  const cfgFrom = d => {
+    const c = { mode: d.mode, diff: +d.diff || 0 };
+    if (d.field) c.field = d.field; if (d.level !== undefined) c.level = +d.level; if (d.subject) c.subject = d.subject;
+    return c;
+  };
+  let lastCfg = null;
+  const ACT = S.actions = {
+    go(el) { if (el.dataset.needplayer) { S.toast('Primero crea o elige un perfil.'); return S.nav.go('profiles'); } S.nav.go(el.dataset.to, {}, el.dataset.reset ? { reset: true } : {}); },
+    back() { S.nav.back(); },
+    selectp(el) { S.store.select(el.dataset.id); S.audio.play('click'); S.nav.go('menu', {}, { reset: true }); },
+    delp(el) { S.nav.go('profiles', { del: el.dataset.id }, { replace: true }); },
+    delp0() { S.nav.go('profiles', {}, { replace: true }); },
+    delp2(el) { S.store.remove(el.dataset.id); S.nav.go('profiles', {}, { replace: true }); },
+    mode(el) {
+      const m = el.dataset.mode, p = S.store.cur();
+      if (m === 'adventure') return S.nav.go('worlds');
+      if (m === 'practice') return S.nav.go('fields');
+      if (m === 'final' && advDone(p) < S.FINAL_REQ) { S.toast(`Completa ${S.FINAL_REQ} niveles de Aventura para abrir el Desafío final.`); return; }
+      S.nav.go('briefing', { mode: m });
+    },
+    brief(el) { S.nav.go('briefing', { mode: el.dataset.mode, field: el.dataset.field, level: +el.dataset.level }); },
+    bsetup(el) { S.nav.go('briefing', { mode: el.dataset.mode, diff: +el.dataset.diff }, { replace: true }); },
+    pfield(el) { S.nav.go('practice', { field: el.dataset.field }); },
+    psetup(el) { S.nav.go('practice', { field: el.dataset.field, subject: el.dataset.subject, diff: +el.dataset.diff }, { replace: true }); },
+    practicewith(el) { S.nav.go('practice', { field: el.dataset.field, subject: el.dataset.subject }); },
+    startgame(el) { lastCfg = cfgFrom(el.dataset); S.game.start(lastCfg); },
+    again() { const r = current.params; if (r && r.cfg) { lastCfg = r.cfg; S.game.start(lastCfg); } else S.nav.go('modes', {}, { reset: true }); },
+    claim(el) {
+      const p = S.store.cur(); const d = S.missionDef(S.ensureMissions(p).list[+el.dataset.i].id);
+      if (S.claimMission(p, +el.dataset.i)) { S.toast(`<b>Misión reclamada</b><span>+${d.coins} monedas · +${d.xp} XP</span>`); S.confetti(30, innerWidth / 2, innerHeight / 3); render(); }
+    },
+    claimbonus() { const p = S.store.cur(); if (S.claimBonus(p)) { S.toast('<b>Bono del día reclamado</b><span>+30 monedas · +60 XP</span>'); S.confetti(60); render(); } },
+    shoptab(el) { S.nav.go('shop', { cat: el.dataset.cat }, { replace: true }); },
+    buy(el) {
+      const p = S.store.cur(), cat = el.dataset.cat, it = S.ITEMS[cat].find(x => x.id === el.dataset.id);
+      if (!it || p.owned[cat].includes(it.id)) return;
+      if (p.coins < it.price) { S.toast('Te faltan monedas para este objeto.'); return; }
+      p.coins -= it.price; p.owned[cat].push(it.id); p.equipped[cat] = it.id; p.counters.bought++;
+      S.audio.play('coin'); S.checkAchievements(p); S.store.save();
+      S.toast(`<b>Comprado y equipado</b><span>${esc(it.name)}</span>`); render();
+    },
+    equip(el) { const p = S.store.cur(); const cat = el.dataset.cat; if (p.owned[cat].includes(el.dataset.id)) { p.equipped[cat] = el.dataset.id; S.store.save(); S.audio.play('click'); render(); } },
+    testsound() { S.audio.play('ok'); },
+    cfg(el) { S.nav.go('settings', { confirm: el.dataset.c }, { replace: true }); },
+    cfg0() { S.nav.go('settings', {}, { replace: true }); },
+    reset2() { const p = S.store.cur(); S.store.reset(p.id); S.toast('Progreso reiniciado.'); S.nav.go('menu', {}, { reset: true }); },
+    wipe2() { S.store.wipe(); S.audio.music(false); S.nav.go('home', {}, { reset: true }); }
+  };
+
+  S.onSubmit = function (form, e) {
+    if (form.dataset.form === 'newp') {
+      e.preventDefault();
+      const name = form.elements.name.value.trim(), err = $('#perr');
+      if (name.length < 2) { err.hidden = false; err.textContent = 'Escribe un nombre de al menos 2 letras.'; return; }
+      if (S.store.players().some(p => p.name.toLowerCase() === name.toLowerCase())) { err.hidden = false; err.textContent = 'Ya existe un perfil con ese nombre. Elige otro.'; return; }
+      S.store.create(name, form.elements.av.value); S.audio.play('done'); S.nav.go('menu', {}, { reset: true });
+    }
+  };
+})(window.S);
+
+/* Saberium — arranque y eventos globales */
+(function (S) {
+  'use strict';
+  const { $ } = S;
+  const CLICK_SFX = new Set(['go', 'back', 'mode', 'brief', 'bsetup', 'pfield', 'psetup', 'startgame', 'shoptab', 'equip', 'pause', 'resume', 'next', 'again', 'practicewith']);
+
+  document.addEventListener('click', e => {
+    const el = e.target.closest('[data-act]');
+    if (!el || el.disabled) return;
+    const act = el.dataset.act, fn = (S.game.actions && S.game.actions[act]) || S.actions[act];
+    if (!fn) return;
+    S.audio.init();
+    if (S.store.settings().music && !S.audio.musicOn) S.audio.music(true);
+    if (CLICK_SFX.has(act)) S.audio.play('click');
+    fn(el, e);
+  });
+
+  document.addEventListener('submit', e => { const f = e.target.closest('[data-form]'); if (f) S.onSubmit(f, e); });
+
+  document.addEventListener('change', e => {
+    const t = e.target, s = S.store.settings();
+    if (t.dataset && t.dataset.set) {
+      s[t.dataset.set] = t.checked; S.store.save(); S.applyPrefs();
+      if (t.dataset.set === 'music') { S.audio.init(); S.audio.music(t.checked); }
+      if (t.dataset.set === 'sfx' && t.checked) S.audio.play('ok');
+    }
+  });
+  document.addEventListener('input', e => {
+    const t = e.target;
+    if (t.dataset && t.dataset.setr) { S.store.settings()[t.dataset.setr] = +t.value; S.audio.setVol(); S.store.save(); }
+  });
+
+  document.addEventListener('keydown', e => S.game.key(e));
+  document.addEventListener('visibilitychange', () => { if (document.hidden) S.game.pauseIfActive(); });
+  window.addEventListener('resize', () => { const c = $('#fx'); if (c) { c.width = innerWidth; c.height = innerHeight; } });
+
+  S.applyPrefs();
+  S.nav.go('home', {}, { reset: true });
+})(window.S);
+
+</script>
+</body></html>
